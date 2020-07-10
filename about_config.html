@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Privacy Guide</title>
+  </head>
+  <body>
+    <h1>about:config settings</h1>
+
+    <p>
+      This is an explanation of all the settings in my <a href="browsers.html#firefox">Firefox hardening guide</a>.
+    </p>
+
+    <div class="boxed">
+      media.peerconnection.enabled = false
+    </div>
+
+    <p>
+      This setting disables <a href="https://en.wikipedia.org/wiki/WebRTC">WebRTC</a> which can <a href="https://browserleaks.com/webrtc">leak your IP address</a> even with a VPN.
+    </p>
+
+    <div class="boxed">
+       privacy.firstparty.isolate = true
+    </div>
+
+    <p>
+      This enables first party isolation which seperates cookies from different websites. This means cookies from one site cannot interact with cookies from other websites which prevents websites from seeing your open tabs.
+    </p>
+
+    <div class="boxed">
+      privacy.resistFingerprinting = true
+    </div>
+
+    <p>
+      This enables <a href="https://panopticlick.eff.org">fingerprinting</a> protection which helps protect against <a href="https://wiki.mozilla.org/Security/Fingerprinting">multiple browser fingerprinting techniques</a>.
+    </p>
+
+    <div class="boxed">
+      browser.cache.offline.enable = false
+    </div>
+
+    <p>
+      This disables <a href="http://kb.mozillazine.org/Browser.cache.offline.enable">offline caching</a> to prevent any data about what you did in your browser being stored on your hard drive.
+    </p>
+
+    <div class="boxed">
+      browser.sessionstore.max_tabs_undo = 0
+    </div>
+
+    <p>
+      This prevents your previous tabs from being saved in your browser.
+    </p>
+
+    <div class="boxed">
+      browser.urlbar.speculativeConnect.enabled = false
+    </div>
+
+    <p>
+      This disables <a href="https://www.ghacks.net/2017/07/24/disable-preloading-firefox-autocomplete-urls/">preloading of autocomplete URLs</a>.
+    </p>
+
+    <div class="boxed">
+      dom.event.clipboardevents.enabled = false
+    </div>
+
+    <p>
+      This prevents websites from <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Preferences/Preference_reference/dom.event.clipboardevents.enabled">seeing what you do with your clipboard</a> e.g. copying or pasting certain things on their website.
+    </p>
+
+    <div class="boxed">
+      geo.enabled = false
+    </div>
+
+    <p>
+      This disables <a href="https://browserleaks.com/geo">geolocation</a>.
+    </p>
+
+    <div class="boxed">
+      media.eme.enabled = false
+    </div>
+
+    <p>
+      This disables <a href="https://support.mozilla.org/en-US/kb/enable-drm#w_opt-out-of-cdm-playback-uninstall-cdms-and-stop-all-cdm-downloads">playback of DRM controlled content</a> which automatically downloads the Widevine Content Decryption Module by Google.
+    </p>
+
+    <div class="boxed">
+      media.gmp-widevinecdm.enabled = false
+    </div>
+
+    <p>
+      This disables the Widevine Content Decryption Module.
+    </p>
+
+    <div class="boxed">
+      media.navigator.enabled = false
+    </div>
+
+    <p>
+      This prevents websites from being able to track your webcam and microphone status.
+    </p>
+
+    <div class="boxed">
+      network.cookie.cookieBehavior = 1
+    </div>
+
+    <p>
+      This <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Cookies_Preferences">blocks third party cookies</a>.
+    </p>
+
+    <div class="boxed">
+      network.cookie.lifetimePolicy = 2
+    </div>
+
+    <p>
+      This <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Cookies_Preferences">clears cookies</a> at the end of each browser session.
+    </p>
+
+    <div class="boxed">
+      network.http.referer.trimmingPolicy = 2
+    </div>
+
+    <p>
+      This makes Firefox only send the scheme, host and port in the <a href="https://wiki.mozilla.org/Security/Referrer">referer header</a>.
+    </p>
+
+    <div class="boxed">
+      network.http.referer.XOriginPolicy = 2
+    </div>
+
+    <p>
+      This makes Firefox send the referer header only when the <a href="https://wiki.mozilla.org/Security/Referrer">hostnames match</a>.
+    </p>
+
+    <div class="boxed">
+      network.http.referer.XOriginTrimmingPolicy = 2
+    </div>
+
+    <p>
+      This makes Firefox only send the scheme, host and port in the <a href="https://wiki.mozilla.org/Security/Referrer">referer header</a> of cross-origin requests.
+    </p>
+
+    <div class="boxed">
+      webgl.disabled = true
+    </div>
+
+    <p>
+      This disables webgl which can be used for <a href="https://browserleaks.com/webgl">browser fingerprinting</a> and is <a href="https://security.stackexchange.com/questions/13799/is-webgl-a-security-concern">insecure</a>.
+    </p>
+
+    <div class="boxed">
+      browser.sessionstore.privacy_level = 2
+    </div>
+
+    <p>
+      This setting makes Firefox <a href="http://kb.mozillazine.org/Browser.sessionstore.privacy_level">never store any extra session data</a>.
+    </p>
+
+    <div class="boxed">
+      network.IDN_show_punycode = true
+    </div>
+
+    <p>
+      This renders IDNs as <a href="https://en.wikipedia.org/wiki/Punycode">punycode</a> which if not set, may make you vulnerable to <a href="https://krebsonsecurity.com/2018/03/look-alike-domains-and-visual-confusion/#more-42636">hard to notice phishing attacks</a>.
+    </p>
+
+    <div class="boxed">
+      extensions.blocklist.url = https://blocklists.settings.services.mozilla.com/v1/blocklist/3/%20/%20/
+    </div>
+
+    <p>
+      This limits the amount of <a href="https://old.reddit.com/r/privacytoolsIO/comments/9uqeew/firefox_tip_sanitize_firefox_blocklist_url_so_it/">identifiable information</a> sent when requesting the Mozilla harmful extension blocklist.
+    </p>
+
+    <div class="boxed">
+      dom.event.contextmenu.enabled = false
+    </div>
+
+    <p>
+      This prevents websites from messing with the context menu.
+    </p>
+
+    <div class="boxed">
+      network.http.referer.spoofSource = true
+    </div>
+
+    <p>
+      This makes Firefox send <a href="https://wiki.mozilla.org/Security/Referrer">the target URL as the referer</a>.
+    </p>
+
+    <div class="boxed">
+      privacy.trackingprotection.enabled = false
+    </div>
+
+    <p>
+      This disables <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Privacy/Tracking_Protection">tracking protection</a> which is useless and just adds to your fingerprint when used with Ublock Origin.
+    </p>
+
+    <div class="boxed">
+      geo.wifi.uri = blank <br>
+      browser.search.geoip.url = blank
+    </div>
+
+    <p>
+      These remove Firefox's geolocation provider.
+    </p>
+
+    <div class="boxed">
+      browser.aboutHomeSnippets.updateUrL = blank <br>
+      browser.startup.homepage_override.mstone = ignore <br>
+      browser.startup.homepage_override.buildID = blank <br>
+      startup.homepage_welcome_url = blank <br>
+      startup.homepage_welcome_url.additional = blank <br>
+      startup.homepage_override_url = blank
+    </div>
+
+    <p>
+      These disable <a href="https://support.mozilla.org/en-US/kb/how-stop-firefox-making-automatic-connections">connections Firefox makes</a> when your start the browser or visit your home page.
+    </p>
+
+    <div class="boxed">
+      toolkit.telemetry.cachedClientID = blank
+    </div>
+
+    <p>
+      Disables telemetry ID.
+    </p>
+
+    <div class="boxed">
+      browser.send_pings.require_same_host = true
+    </div>
+
+    <p>
+      This makes Firefox only send pings to the website <a href="http://kb.mozillazine.org/Browser.send_pings.require_same_host">you are currently on</a>.
+    </p>
+
+    <div class="boxed">
+      network.dnsCacheEntries = 100
+    </div>
+
+    <p>
+      This limits the <a href="http://kb.mozillazine.org/About:config_entries#Network.">amount of entries in your DNS cache</a> which can give someone who has access to your computer a list of websites you visited.
+    </p>
+
+    <div class="boxed">
+      places.history.enabled = false
+    </div>
+
+    <p>
+      This disables <a href="https://wiki.mozilla.org/Places">recording of visited websites</a>.
+    </p>
+
+    <div class="boxed">
+      browser.formfill.enable = false
+    </div>
+
+    <p>
+      This disables the <a href="http://kb.mozillazine.org/About:config_entries#Browser.">saving of form data</a>.
+    </p>
+
+    <div class="boxed">
+      browser.cache.disk.enable = false <br>
+      browser.cache.disk_cache_ssl = false <br>
+      browser.cache.memory.enable = false <br>
+      browser.cache.offline.enable = false
+    </div>
+
+    <p>
+      Disables caching.
+    </p>
+
+    <div class="boxed">
+      network.predictor.enabled = false
+      network.dns.disablePrefetch = true
+      network.prefetch-next = false
+    </div>
+
+    <p>
+      Disables prefetching.
+    </p>
+
+    <div class="boxed">
+      network.http.speculative-parallel-limit = 0
+    </div>
+
+    <p>
+      Disable prefetching on mouse hover.
+    </p>
+
+    <div class="boxed">
+      extensions.pocket.enabled = false <br>
+      extensions.pocket.site = blank <br>
+      extensions.pocket.oAuthConsumerKey = blank <br>
+      extensions.pocket.api = blank
+    </div>
+
+    <p>
+      Disables <a href="https://www.mozilla.org/en-US/firefox/pocket/">Pocket</a>.
+    </p>
+
+    <div class="boxed">
+      browser.newtabpage.activity-stream.feeds.telemetry = false <br>
+      browser.newtabpage.activity-stream.telemetry = false <br>
+      browser.ping-centre.telemetry = false <br>
+      toolkit.telemetry.archive.enabled = false <br>
+      toolkit.telemetry.bhrPing.enabled = false <br>
+      toolkit.telemetry.enabled = false <br>
+      toolkit.telemetry.hybridContent.enabled = false <br>
+      toolkit.telemetry.firstShutdownPing.enabled = false <br>
+      toolkit.telemetry.newProfilePing.enabled = false <br>
+      toolkit.telemetry.reportingpolicy.firstRun = false <br>
+      toolkit.telemetry.server = blank <br>
+      toolkit.telemetry.shutdownPingSender.enabled = false <br>
+      toolkit.telemetry.unified = false <br>
+      toolkit.telemetry.updatePing.enabled = false <br>
+      network.allow-experiments = false <br>
+      browser.tabs.crashReporting.sendReport = false <br>
+      dom.ipc.plugins.flash.subprocess.crashreporter.enabled = false <br>
+      toolkit.crashreporter.infoURL = blank <br>
+      datareporting.healthreport.infoURL = blank <br>
+      datareporting.healthreport.uploadEnabled = false <br>
+      datareporting.policy.firstRunURL = blank
+    </div>
+
+    <p>
+      Disables <a href="https://wiki.mozilla.org/Telemetry">telemetry</a>, datareporting, <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Crash_reporting">crash reporting</a> and experiments.
+    </p>
+
+    <div class="boxed">
+      privacy.spoof_english = 2
+    </div>
+
+    <p>
+      This makes websites only able to see "English" and not your set language for enhanced privacy.
+    </p>
+
+    <div class="boxed">
+      intl.accept_languages = en-US
+    </div>
+
+    <p>
+      This sets your language to "en-US" which is the most common language so you will blend more.
+    </p>
+
+    <div class="boxed">
+      accessibility.force_disabled = 1
+    </div>
+
+    <p>
+      This prevents accessibility services from <a href="https://wiki.mozilla.org/Electrolysis/Accessibility#Preferences">accessing your browser</a>.
+    </p>
+
+    <div class="boxed">
+      network.captive-portal-service.enabled = false <br>
+      captivedetect.canonicalURL = blank
+    </div>
+
+    <p>
+      This disables Firefox's <a href="https://wiki.mozilla.org/QA/Captive_Portals">captive portal</a> which sends requests to detectportal.firefox.com every time you start the browser. This may give Mozilla information about you or your browser. The captive portal also uses http which can be <a href="https://forums.whonix.org/t/universal-firefox-attack-through-http-manipulation-and-wont-fix/6726">manipulated</a>.
+    </p>
+
+    <div class="boxed">
+      browser.newtabpage.activity-stream.feeds.snippets = false
+    </div>
+
+    <p>
+      This disables <a href="https://wiki.mozilla.org/Firefox/Projects/Firefox_Start/Snippet_Service">snippets</a>.
+    </p>
+
+    <div class="boxed">
+      gfx.font_rendering.graphite.enabled = false
+    </div>
+
+    <p>
+      This disables graphite which is a "smart font" system. Mozilla was <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1255731">convinced</a> that leaving this enabled was too risky but reverted that decision after a few bug fixes.
+    </p>
+
+    <div class="boxed">
+      network.jar.block-remote-files = true
+    </div>
+
+    <p>
+      This blocks remote JAR files to reduce attack surface.
+    </p>
+
+    <div class="boxed">
+      javascript.options.ion = false <br>
+      javascript.options.native_regexp = false <br>
+      javascript.options.baselinejit = false
+    </div>
+
+    <p>
+      These disable the JavaScript ION JIT, native regular expressions and Baseline JIT. This improves security as JIT causes a lot of security problems such as heap spraying attacks.
+    </p>
+
+    <div class="boxed">
+      dom.webaudio.enabled = false <br>
+      media.webaudio.enabled = false
+    </div>
+
+    <p>
+      This disables WebAudio which can be used to fingerprint your browser.
+    </p>
+
+    <div class="boxed">
+      mathml.disabled = true
+    </div>
+
+    <p>
+      This disables mathml to reduce attack surface.
+    </p>
+
+    <div class="boxed">
+      gfx.font_rendering.opentype_svg.enabled = false <br>
+      svg.disabled = true
+    </div>
+
+    <p>
+      These disable SVG images. In the past, these have had vulnerabilities that helped to <a href="https://blog.mozilla.org/security/2016/11/30/fixing-an-svg-animation-vulnerability/">de-anonymize</a> Tor Browser users by giving them malware so it's best to disable these.
+    </p>
+  </body>
+</html>

@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Privacy Guide</title>
+  </head>
+  <body class="hardening">
+    <h1>ARCH LINUX SECURITY AND PRIVACY GUIDE</h1>
+
+    <p>
+      This guide aims to help you harden your system for privacy and security. <br>
+      <br>
+      This will work for most other Linux distributions. Some settings may be different or some files may be placed elsewhere though.<br>
+    </p>
+
+    <h2>Contents</h2>
+
+    <div class="headers">
+      <a href="#kernel">1. Kernels</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#sysctl">1.1 Sysctl</a> <br>
+        <a href="#boot_parameters">1.2 Boot Parameters</a> <br>
+        <a href="#hidepid">1.3 hidepid</a> <br>
+        <a href="#nf_conntrack_helper">1.4 Netfilter's connection tracking helper</a> <br>
+        <a href="#linux-hardened">1.5 Linux-hardened</a> <br>
+        <a href="#grsecurity">1.6 Grsecurity</a> <br>
+        <a href="#compiling-your-own-kernel">1.7 Compiling your own kernel</a> <br>
+      </div>
+
+      <br>
+      <a href="#MAC">2. Mandatory Access Control</a> <br>
+      <br>
+      <a href="#sandboxes">3. Sandboxes</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#sandboxing_xorg">3.1 Sandboxing Xorg</a> <br>
+      </div>
+
+      <br>
+      <a href="#root">4. The Root Account</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#securetty">4.1 /etc/securetty</a> <br>
+        <a href="#restricting_su">4.2 Restricting su</a> <br>
+        <a href="#locking_root">4.3 Locking the root account</a> <br>
+        <a href="#denying_root_login_ssh">4.4 Denying Root Login via SSH</a> <br>
+        <a href="#increase_number_of_rounds">4.5 Increase the Number of Hashing Rounds</a> <br>
+      </div>
+
+      <br>
+      <a href="#systemd_sandboxes">5. Systemd Sandboxing</a> <br>
+      <br>
+      <a href="#restricting_xorg">6. Restricting Xorg Root Access</a> <br>
+      <br>
+      <a href="#firewalls">7. Firewalls</a> <br>
+      <br>
+      <a href="#tor">8. Tor</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#tor_browser">8.1 Tor browser</a> <br>
+        <a href="#torsocks">8.2 Torsocks</a> <br>
+        <a href="#stream_isolation">8.3 Stream Isolation</a> <br>
+        <a href="#transparent_proxy">8.4 Transparent Proxy</a> <br>
+        <a href="#tor_over_tor">8.5 Tor over Tor</a> <br>
+        <a href="#tor_browser_tor_over_tor">8.6 Configuring the Tor Browser to prevent Tor over Tor</a> <br>
+      </div>
+
+      <br>
+      <a href="#hostnames">9. Hostnames and Usernames</a> <br>
+      <br>
+      <a href="#bluetooth">10. Wireless Devices</a> <br>
+      <br>
+      <a href="#mac_address">11. MAC Address Spoofing</a> <br>
+      <br>
+      <a href="#umask">12. Umask</a> <br>
+      <br>
+      <a href="#usbs">13. USBs</a> <br>
+      <br>
+      <a href="#thunderbolt_and_firewire">14. Thunderbolt and Firewire</a> <br>
+      <br>
+      <a href="#virtual_machines">15. Virtual Machines</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#virtualbox">15.1 Virtualbox</a> <br>
+        <a href="#kvm/qemu">15.2 KVM/QEMU</a> <br>
+        <a href="#nested_virtualization">15.3 Nested Virtualization</a> <br>
+      </div>
+
+      <br>
+      <a href="#core_dumps">16. Core Dumps</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#core_dumps_sysctl">16.1 Sysctl</a> <br>
+        <a href="#core_dumps_systemd">16.2 Systemd</a> <br>
+        <a href="#core_dumps_ulimit">16.3 Ulimit</a> <br>
+        <a href="#core_dumps_setuid">16.4 Disabling setuid processes from dumping their memory</a> <br>
+      </div>
+
+      <br>
+      <a href="#microcode">17. Microcode Updates</a> <br>
+
+      <br>
+      <a href="#icmp_timestamps">18. ICMP Timestamps</a> <br>
+      <br>
+      <a href="#ntp">19. NTP</a> <br>
+      <br>
+      <a href="#ipv6_privacy">20. IPv6 Privacy Extensions</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#ipv6_networkmanager">20.1 NetworkManager</a> <br>
+        <a href="#ipv6_systemd-networkd">20.2 systemd-networkd</a> <br>
+      </div>
+
+      <br>
+      <a href="#bootloaders">21. Bootloaders</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#grub">21.1 GRUB</a> <br>
+        <a href="#syslinux">21.2 Syslinux</a> <br>
+        <a href="#systemd-boot">21.3 systemd-boot</a> <br>
+      </div>
+
+      <br>
+      <a href="#pam">22. PAM</a> <br>
+      <br>
+      <a href="#uncommon_protocols">23. Blacklist Uncommon Network Protocols</a> <br>
+      <br>
+      <a href="#partitioning">24. Partitioning and Mount Options</a> <br>
+      <br>
+      <a href="#uncommon_filesystems">25. Disable Mounting of Uncommon Filesystems</a> <br>
+      <br>
+      <a href="#editing_as_root">26. Editing Files as Root</a> <br>
+      <br>
+      <a href="#entropy">27. Entropy</a> <br>
+      <br>
+
+      <div class="subheaders">
+        <a href="#haveged">27.1 Haveged</a> <br>
+        <a href="#jitterentropy">27.2 Jitterentropy</a> <br>
+      </div>
+
+      <br>
+      <a href="#microphones_and_webcams">28. Microphones and Webcams</a> <br>
+      <br>
+      <a href="#best_practices">29. Best Practices</a> <br>
+
+    </div>
+
+    <h2 id="kernel">1. Kernels</h2>
+
+
+    <p>
+      An important part of Linux security is hardening the kernel against exploits. This can be with boot parameters, sysctls, kernel patches etc.
+    </p>
+
+    <h3 id="sysctl">1.1 Sysctl</h3>
+
+    <p>
+      Sysctl is a tool that can increase the kernel's security by changing certain kernel tunables. To change settings temporarily you can use
+    </p>
+
+    <div class="boxed">
+       sysctl -w (param [value])
+    </div>
+
+    <p>
+      To change them permanently you can add files to /etc/sysctl.d. <br>
+      <br>
+      In /etc/sysctl.d create a file called "kptr_restrict.conf" (the name does not matter as long as it ends in '.conf'). In this file add
+    </p>
+
+    <div class="boxed">
+       kernel.kptr_restrict=2
+    </div>
+
+    <p>
+      This setting attempts to prevent any kernel pointer leaks via various methods (such as in /proc/kallsyms or dmesg). Kernel pointers can be very useful for kernel exploits. Alternatively you can add "kernel.kptr_restrict=1" but this only hides kernel symbols for users other than the root user. <br>
+      <br>
+      Now create "dmesg_restrict.conf" and add
+    </p>
+
+    <div class="boxed">
+      kernel.dmesg_restrict=1
+    </div>
+    <p>
+
+      This blocks users other than root from being able to see the kernel logs. The kernel logs can give an attacker useful information such as kernel pointers. <br>
+      <br>
+      Create "harden_bpf.conf" and add
+    </p>
+
+    <div class="boxed">
+      kernel.unprivileged_bpf_disabled=1<br>
+      net.core.bpf_jit_harden=2<br>
+    </div><br>
+
+    <p>
+      This makes it so that only root can use the BPF JIT compiler and to harden it. A JIT compiler opens up the possibility for an attacker to exploit many vulnerabilities such as JIT spraying. <br>
+      <br>
+      Create "ptrace_scope.conf" and add
+    </p>
+
+    <div class="boxed">
+       kernel.yama.ptrace_scope=2
+    </div>
+
+    <p>
+      This makes only processes with CAP_SYS_PTRACE able to use ptrace. Ptrace is a system call that allows a program to alter and inspect a running process which allows attackers to easily compromise other running programs. <br>
+      <br>
+      Create "kexec.conf" and add
+    </p>
+
+    <div class="boxed">
+      kernel.kexec_load_disabled=1
+    </div>
+
+    <p>
+      This disables kexec which can be used to replace the running kernel. <br>
+      <br>
+      Create "tcp_hardening.conf" and add
+    </p><br>
+
+    <div class="boxed">
+      net.ipv4.tcp_syncookies=1
+    </div>
+
+    <p>
+      This helps protect against SYN flood attacks which is a form of denial of service attack where an attacker sends a lot of SYN requests in an attempt to consume enough resources to make the system unresponsive to legitimate traffic.</sup>
+    </p>
+
+    <div class="boxed">
+      net.ipv4.tcp_rfc1337=1
+    </div>
+
+    <p>
+      This protects against time-wait assassination. It drops RST packets for sockets in the time-wait state. </sup>
+    </p>
+
+    <div class="boxed">
+      net.ipv4.conf.default.rp_filter=1 <br>
+      net.ipv4.conf.all.rp_filter=1
+    </div>
+
+    <p>
+      These enable source validation of packets received from all interfaces of the machine. This protects against IP spoofing methods in which an attacker can send a packet with a fake IP address. </sup>
+    </p>
+
+    <div class="boxed">
+      net.ipv4.conf.all.accept_redirects=0 <br>
+      net.ipv4.conf.default.accept_redirects=0 <br>
+      net.ipv4.conf.all.secure_redirects=0 <br>
+      net.ipv4.conf.default.secure_redirects=0 <br>
+      net.ipv6.conf.all.accept_redirects=0 <br>
+      net.ipv6.conf.default.accept_redirects=0
+    </div>
+
+    <p>
+      These disable ICMP redirect acceptance. If these settings are not set then an attacker can redirect an ICMP request to anywhere they want.
+    </p>
+
+    <div class="boxed">
+      net.ipv4.conf.all.send_redirects=0 <br>
+      net.ipv4.conf.default.send_redirects=0
+    </div>
+
+    <p>
+      These disable ICMP redirect sending when on a non-router.</sup>
+    </p>
+
+    <div class="boxed">
+      net.ipv4.icmp_echo_ignore_all=1
+    </div>
+
+    <p>
+      This settings makes your system ignore ICMP requests. <br>
+      <br>
+      All of these harden the TCP/IP stack and tighten network security options.<br>
+      <br>
+      Create "mmap_aslr.conf" and add <br>
+    </p>
+
+    <div class="boxed">
+      vm.mmap_rnd_bits=32 <br>
+      vm.mmap_rnd_compat_bits=16
+    </div><br>
+
+    <p>
+      These settings are set to the highest value to improve ASLR effectiveness for mmap. <sup><a href="#ref-10">[10]</a></sup> <br>
+    </p>
+
+    <p>
+      Create "sysrq.conf" and add
+    </p>
+
+    <div class="boxed">
+      kernel.sysrq=0
+    </div>
+
+    <p>
+      This disables the SysRq key which exposes tons of potentially dangerous debugging functionality to unprivileged, local users. <br>
+      <br>
+      Create "unprivileged_users_clone.conf" and add
+    </p>
+
+    <div class="boxed">
+      kernel.unprivileged_userns_clone=0
+    </div>
+
+    <p>
+      This disables unprivileged user namespaces. User namespaces add a lot of attack surface for privilege escalation so it's best to restrict them to root only. This may break some sandboxing programs such as bubblewrap. These can be fixed by making the sandbox binaries setuid. <br>
+      <br>
+      Create "tcp_sack.conf" and add
+    </p>
+
+    <div class="boxed">
+      net.ipv4.tcp_sack=0
+    </div>
+
+    <p>
+      This disables <a href="https://tools.ietf.org/html/rfc2018">TCP SACK</a>. SACK is <a href="https://github.com/Netflix/security-bulletins/blob/master/advisories/third-party/2019-001.md">commonly exploited</a> and not needed for many circumstances so it should be disabled if you don't need it. To learn if SACK is needed for you or not, see <a href="https://serverfault.com/questions/10955/when-to-turn-tcp-sack-off">https://serverfault.com/questions/10955/when-to-turn-tcp-sack-off</a>.
+    </p>
+
+    <h3 id="boot_parameters">1.2 Boot Parameters</h3>
+
+    <p>
+      Boot parameters pass settings to the kernel at boot using your bootloader. Some settings can be used to increase security. If using GRUB then edit /etc/default/grub and add your parameters at "GRUB_CMDLINE_LINUX_DEFAULT=". <br>
+      <br>
+      If using Syslinux then edit /boot/syslinux/syslinux.cfg and add them to the 'APPEND' line. <br>
+      <br>
+      Add "apparmor=1 security=apparmor" to enable AppArmor. If using SELinux or other LSMs then do not use these settings.<br>
+      <br>
+      Add "slab_nomerge" to disable slab merging. Sometimes a slab can be used in a vulnerable way which an attacker can exploit. <br>
+      <br>
+      Add "slub_debug=FZ" to enable sanity checks (F) and redzoning (Z). Sanity checks make sure that memory has been overwrited correctly. Redzoning adds extra areas around slabs that detect when a slab is overwritten past its real size, which can help detect overflows. <br>
+      <br>
+      Add "init_on_alloc=1 init_on_free=1". This zeroes memory during allocation and free time to prevent leaking secrets in memory. <br>
+      <br>
+      Add "mce=0". This causes the kernel to panic on uncorrectable errors in ECC memory which could be exploited. This is not needed for systems without ECC memory. <br>
+      <br>
+      Add "pti=on". This enables Kernel Page Table Isolation which mitigates Meltdown and prevents some KASLR bypasses. <br>
+      <br>
+      Add "mds=full,nosmt" to enable all mitigations for the MDS vulnerability and disable SMT. This may have a significant performance decrease as it disables hyperthreading. <br>
+      <br>
+      Add "module.sig_enforce=1". This only allows kernel modules <a href="https://www.kernel.org/doc/html/v5.2-rc3/admin-guide/module-signing.html">signed with a valid key</a> to be loaded which increases security by making it harder to load a malicious kernel module. This prevents all out-of-tree kernel modules from being loaded. This includes modules such as the virtualbox modules, wireguard and nvidia drivers which may not be wanted depending on your setup. <br>
+      <br>
+      Add "oops=panic". This causes the kernel to panic on oopses. This prevents the kernel from continuing to run a flawed process which can be exploited. Kernel exploits sometimes also cause an oops which this will help against. Sometimes, buggy drivers cause harmless oopses which will result in your system crashing so this boot parameter can only be used on certain hardware. <br>
+      <br>
+      Optionally add "ipv6.disable=1" to disable the whole IPv6 stack which may have some privacy issues depending on your setup as it uses your MAC address to create an IPv6 address which can be used to track you. This can be solved with <a href="#ipv6_privacy">IPv6 privacy extensions</a> rather than disabling it entirely. This also reduces attack surface so its best to disable it if not needed. <br>
+      <br>
+      So now we have
+    </p>
+
+    <div class="boxed">
+      GRUB_CMDLINE_LINUX_DEFAULT="apparmor=1 security=apparmor slab_nomerge slub_debug=FZ init_on_alloc=1 init_on_free=1 mce=0 pti=on mds=full,nosmt module.sig_enforce=1 oops=panic"
+    </div>
+
+    <p>
+      You will need to regenerate your GRUB configuration file to apply these by running
+    </p>
+
+    <div class="boxed">
+      grub-mkconfig -o /boot/grub/grub.cfg
+    </div>
+
+    <h3 id="hidepid">1.3 hidepid</h3>
+
+    <p>
+      /proc contains information about all processes running on the system. <sup><a href="#ref-17">[17]</a></sup> By default this is accessible to all users. This can allows an attacker to spy a lot on other processes. To allow users to only see their own processes, edit /etc/fstab and add <sup><a href="#ref-18">[18]</a></sup>
+    </p>
+
+    <div class="boxed">
+      proc	/proc	proc	nosuid,nodev,noexec,hidepid=2,gid=proc	0	0
+    </div>
+
+    <p>
+      systemd-logind still needs to see other users' processes so, for user sessions to work correctly add this to /etc/systemd/system/systemd-logind.service.d/hidepid.conf
+    </p>
+
+    <div class="boxed">
+      [Service] <br>
+      SupplementaryGroups=proc
+    </div>
+
+    <h3 id="nf_conntrack_helper">1.4 Netfilter's connection tracking helper</h3>
+
+    <p>
+      Netfilter's automatic conntrack helper assignment is dangerous as it enables a lot of code in the kernel that <a href="https://home.regit.org/netfilter-en/secure-use-of-helpers/">parses incoming network packets which is potentially unsafe</a>. <br>
+      <br>
+      To disable this, create /etc/modprobe.d/no-conntrack-helper.conf and add
+    </p>
+
+    <div class="boxed">
+      options nf_conntrack nf_conntrack_helper=0
+    </div>
+
+    <h3 id="linux-hardened">1.5 Linux-hardened</h3>
+
+    <p>
+      In the Arch repositories there is a package with a hardened kernel. This contains many patches for security and more paranoid defaults. <sup><a href="#ref-19">[19]</a></sup> You should install this and the linux-hardened-headers package.
+    </p>
+
+    <h3 id="grsecurity">1.6 Grsecurity</h3>
+
+    <p>
+      Grsecurity is a set of kernel patches that can increase kernel security. <sup><a href="#ref-20">[20]</a></sup> These patches used to be available for everyone but now it is commercial and you have to pay to get them. These patches offer a great increase in security. <br>
+    </p>
+
+    <h3 id="compiling-your-own-kernel">1.7 Compiling your own kernel</h3>
+
+    <p>
+      You should compile your own kernel and enable as little modules as possible to keep attack surface at a minimum. Distro-compiled kernels also have public kernel symbols which are very useful for exploits. Compiling your own kernel will give you unique kernel symbols which, along with kptr_restrict and dmesg_restrict, will make it a lot harder for attackers to create exploits.
+    </p>
+
+    <h2 id="MAC">2. Mandatory Access Control (MAC)</h2>
+
+    <p>
+      MAC systems give fine-grained control over what programs can access. This means your browser won't have access to your entire home directory or something similar. <br>
+      <br>
+      The most used MAC systems are SELinux and Apparmor. SELinux is a lot more secure than AppArmor but is more difficult to use and isn't supported in Arch so I recommend to use AppArmor. <br>
+      <br>
+      To enable Apparmor, install the AppArmor package, enable the AppArmor systemd service and set the kernel parameters required for AppArmor described above. Just installing AppArmor won't increase security. You need to develop profiles for certain applications to restrict them. <br>
+      <br>
+      To create AppArmor profiles run
+    </p>
+
+    <div class="boxed">
+      aa-genprof /usr/bin/(program)
+    </div>
+
+    <p>
+      Open the program and start using at as you normally would. AppArmor will detect what files it needs access to and will add them to the profile if you choose. This will not cover everything an application will do but it is a good starting point for creating profiles. <br>
+      <br>
+      This is only a very basic explanation but I advise you to learn how to use AppArmor as it can help protect your system against lots of attacks. <br>
+      <br>
+      If you want to take it a step further. You can setup a full system AppArmor policy by using an initramfs hook to confine systemd.
+    </p>
+
+    <h2 id="sandboxes">3. Sandboxes</h2>
+
+    <p>
+     Sandboxes allow you to run a program in an isolated environment that has no, or limited access to the rest of your system. You can use these to secure your applications or run untrusted programs. <br>
+     <br>
+     I recommend to use <a href="https://github.com/containers/bubblewrap">bubblewrap</a> to sandbox programs. It is a very powerful sandbox with minimal attack surface. <br>
+     <br>
+     You should not use Firejail as it has far too large attack surface which has led to Firejail having trivial <a href="https://www.openwall.com/lists/oss-security/2017/01/05/4">privilege escalations and sandbox escapes</a>.
+    </p>
+
+    <h3 id="sandboxing_xorg">3.1 Sandboxing Xorg</h3>
+
+    <p>
+      Any Xorg window can have access to another window. This allows for keyloggers or screenshot programs that can even record the root password. <sup><a href="#ref-21">[21]</a></sup> You can sandbox Xorg with Xpra/Xephyr and bubblewrap. <sup><a href="#ref-22">[22]</a></sup> To use Xephyr install xorg-server-xephyr and to use Xpra install 'xpra'. To sandbox a program with bubblewrap and Xephyr run: TO BE WRITTEN
+    </p>
+
+    <p>
+      Wayland isolates windows from each other by default and would be better to use than Xorg.
+    </p>
+
+    <h2 id="root">4. The Root Account</h2>
+
+    <p>
+      Root can do basically anything and has access to your whole system. This means you should lock it down as much as possible so attackers cannot gain root access.
+    </p>
+
+    <h3 id="securetty">4.1 /etc/securetty</h3>
+
+    <p>
+      /etc/securetty tells the system where you are allowed to login as root. You should keep this file empty so nobody can login as root from a tty. <br>
+    </p>
+
+    <h3 id="restricting_su">4.2 Restricting su</h3>
+
+    <p>
+      su lets you switch users from a terminal. By default it tries to login as root. To restrict the use of su to users within the 'wheel' group, edit /etc/pam.d/su and /etc/pam.d/su-l (that's the letter l, not the number one) and uncomment
+    </p>
+
+    <div class="boxed">
+       auth		required	pam_wheel.so use_uid
+    </div>
+
+    <p>
+      You should have as little users in the 'wheel' group as possible.
+    </p>
+
+    <h3 id="locking_root">4.3 Locking the root account</h3>
+
+    <p>
+      To lock the root account to prevent anyone from logging in as root, run </sup>
+    </p>
+
+    <div class="boxed">
+       passwd -l root
+    </div>
+
+    <h3 id="denying_root_login_ssh">4.4 Denying Root Login via SSH</h3>
+
+    <p>
+      To prevent someone from logging in as root via SSH edit /etc/ssh/sshd_config and add <sup><a href="#ref-28">[28]</a></sup>
+    </p>
+
+    <div class="boxed">
+      PermitRootLogin no
+    </div>
+
+    <h3 id="increase_number_of_rounds">4.5 Increase the Number of Hashing Rounds</h3>
+
+    <p>
+      You can increase the number of hashing rounds that shadow can use. This can increase the security of your hashed passwords. It makes an attacker have to compute a lot more hashes to crack your password. By default shadow uses 5000 rounds but you can increase this to as many as you want. The more rounds it does the slower it wil be to login. Edit /etc/pam.d/passwd and add the rounds option. <sup><a href="#ref-30">[30]</a></sup>
+    </p>
+
+    <div class="boxed">
+      password	required	pam_unix.so sha512 shadow nullok rounds=65536
+    </div>
+
+    <p>
+      This makes shadow perform 65536 rounds. <br>
+      <br>
+      Your passwords are not automatically rehashed after applying this setting so you need to reset the password with
+    </p>
+
+    <div class="boxed">
+      passwd username
+    </div>
+
+    <p>
+      Replace 'username' with the user whose password you are changing. <br>
+      <br>
+      This can be applied to your user account or the root account.
+    </p>
+
+
+    <h2 id="systemd_sandboxes">5. Systemd Sandboxing</h2>
+
+    <p>
+      Systemd has the ability to sandbox services so they can only access what they need. Here is an example of a sandboxed systemd service.
+    </p>
+
+    <div class="boxed">
+      [Service] <br>
+      CapabilityBoundingSet=CAP_NET_BIND_SERVICE <br>
+      ProtectSystem=strict <br>
+      ReadWriteDirectories=/var/lib/tor/ <br>
+      ProtectHome=true <br>
+      ProtectKernelTunables=true <br>
+      ProtectKernelModules=true <br>
+      ProtectControlGroups=true <br>
+      PrivateTmp=true <br>
+      PrivateUsers=yes <br>
+      MemoryDenyWriteExecute=true <br>
+      NoNewPrivileges=true <br>
+      RestrictRealtime=true <br>
+      RestrictAddressFamilies=AF_INET AF_UNIX <br>
+      SystemCallArchitectures=native <br>
+      RestrictNamespaces=yes <br>
+      RuntimeDirectoryMode=0700 <br>
+      SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete @raw-io <br>
+      AppArmorProfile=/etc/apparmor.d/usr.bin.tor <br>
+    </div>
+
+    <p>
+      To learn more about the options you can set, read the <a href="https://www.freedesktop.org/software/systemd/man/systemd.exec.html">systemd.exec</a> manpage. <br>
+    </p>
+
+    <h2 id="restricting_xorg">6. Restricting Xorg Root Access</h2>
+
+    <p>
+      The following section does not apply to Arch Linux as it <a href="https://www.archlinux.org/news/xorg-server-116-is-now-available/">starts X rootless by default</a>. This may help with other distributions. <br>
+      <br>
+      Xorg is a massive amount of code and runs as root by default. This makes it more likely to have exploits that can gain root privileges. <sup><a href="#ref-31">[31]</a></sup> To stop it from using root create /etc/X11/Xwrapper.config and add <sup><a href="#ref-32">[32]</a></sup>
+    </p>
+
+    <div class="boxed">
+     needs_root_rights = no
+    </div>
+
+    <p>
+      To make sure that this works run this command as root and check for Xorg.
+    </p>
+
+    <div class="boxed">
+      ps -U root -u root u
+    </div>
+
+    <h2 id="firewalls">7. Firewalls</h2>
+
+    <p>
+     Firewalls control incoming and outgoing network traffic and can be used to block or allow certain types of traffic. You should always block all incoming traffic unless you have a specific reason not to. <br>
+     <br>
+     It is recommend to set up a strict iptables or nftables firewall.
+    </p>
+
+    <h2 id="tor">8. Tor</h2>
+
+    <p>
+      Tor is an anonymity network that tries to make you anonymous by routing your internet traffic through multiple nodes across the world.
+    </p>
+
+    <h3 id="tor_browser">8.1 Tor browser</h3>
+
+    <p>
+      The Tor Browser is a browser based on Firefox that is configured for anonymity and security which routes all connections through the Tor network. <br>
+      <br>
+      It is recommended not to use any other browser for Tor because you can easily misconfigure it and break it. It will also have a completely different browser fingerprint from the Tor Browser which can be used to deanonymize you. <br>
+      <br>
+      You should use apparmor with the Tor Browser to increase security. <br>
+      <br>
+      <a href="https://github.com/micahflee/torbrowser-launcher/tree/develop/apparmor">https://github.com/micahflee/torbrowser-launcher/tree/develop/apparmor</a>
+    </p>
+
+    <h3 id="torsocks">8.2 Torsocks</h3>
+
+    <p>
+      Torsocks can force other programs' network traffic through Tor which allows you to anonymize more than just your browsing.
+    </p>
+
+    <h3 id="stream_isolation">8.3 Stream Isolation</h3>
+
+    <p>
+     Stream isolation makes programs use different Tor circuits from each other to prevent identity correlation. <sup><a href="#ref-34">[34]</a></sup> To enable this edit /etc/tor/torrc and configure more SocksPorts. 9050 is the default SocksPort. Once you have made more, configure your programs to use those new ports and you will have stream isolation. <br>
+     <br>
+     Pacman can use stream isolation by editing /etc/pacman.conf. Add this to /etc/pacman.conf
+    </p>
+
+    <div class="boxed">
+      XferCommand = /usr/bin/curl --socks5-hostname localhost:9062 --continue-at - --fail --output %o %u
+    </div>
+
+    <p>
+      Replace 9062 with your SocksPort.
+    </p>
+
+    <h3 id="transparent_proxy">8.4 Transparent Proxy</h3>
+
+    <p>
+      You can configure your whole system to use Tor by default with a transparent proxy to anonymize all internet traffic. <br>
+      <br>
+      To do this add this to /etc/tor/torrc:
+    </p>
+
+    <div class="boxed">
+      TransPort 9040 <br>
+      DNSPort 5353 <br>
+      SocksPort 9050 <br>
+    </div>
+
+    <p>
+      Create /etc/iptables/iptables.rules and add:
+    </p>
+
+    <div class="boxed">
+      *nat <br>
+      :PREROUTING ACCEPT [6:2126] <br>
+      :INPUT ACCEPT [0:0] <br>
+      :OUTPUT ACCEPT [17:6239] <br>
+      :POSTROUTING ACCEPT [6:408] <br>
+      <br>
+      -A PREROUTING ! -i lo -p udp -m udp --dport 53 -j REDIRECT --to-ports 5353 <br>
+      -A PREROUTING ! -i lo -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports 9040 <br>
+      -A OUTPUT -o lo -j RETURN <br>
+      --ipv4 -A OUTPUT -d 192.168.0.0/16 -j RETURN <br>
+      -A OUTPUT -m owner --uid-owner "tor" -j RETURN <br>
+      -A OUTPUT -p udp -m udp --dport 53 -j REDIRECT --to-ports 5353 <br>
+      -A OUTPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports 9040 <br>
+      COMMIT <br>
+      <br>
+      *filter <br>
+      :INPUT DROP [0:0] <br>
+      :FORWARD DROP [0:0] <br>
+      :OUTPUT DROP [0:0] <br>
+      <br>
+      -A INPUT -i lo -j ACCEPT <br>
+      -A INPUT -p icmp -j ACCEPT <br>
+      -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT <br>
+      --ipv4 -A INPUT -p tcp -j REJECT --reject-with tcp-reset <br>
+      --ipv4 -A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable <br>
+      --ipv4 -A INPUT -j REJECT --reject-with icmp-proto-unreachable <br>
+      --ipv6 -A INPUT -j REJECT <br>
+      --ipv4 -A OUTPUT -d 127.0.0.0/8 -j ACCEPT <br>
+      --ipv4 -A OUTPUT -d 192.168.0.0/16 -j ACCEPT <br>
+      --ipv6 -A OUTPUT -d ::1/8 -j ACCEPT <br>
+      -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT <br>
+      -A OUTPUT -m owner --uid-owner "tor" -j ACCEPT <br>
+      --ipv4 -A OUTPUT -j REJECT --reject-with icmp-port-unreachable <br>
+      --ipv6 -A OUTPUT -j REJECT <br>
+      COMMIT<br>
+    </div>
+
+    <p>
+      Symlink this to /etc/iptables/ip6tables.rules if using IPv6. <br>
+      <br>
+      Edit /etc/resolv.conf and set it to 127.0.0.1. You may need to configure dnsmasq or any other resolver to set your DNS as 127.0.0.1:5353. <br>
+      <br>
+      Edit /etc/dhcpcd.conf and add "nohook resolv.conf" to stop it from overwriting resolv.conf. Run "chattr +i /etc/resolv.conf" to prevent all services from overwriting it. <br>
+      <br>
+      To use stream isolation with a transparent proxy then add more SocksPorts in your torrc and configure your programs to use those ports. <br>
+    </p>
+
+    <h3 id="tor_over_tor">8.5 Tor over Tor</h3>
+
+    <p>
+      If you force Tor traffic to go through Tor again you will get Tor over Tor. For example if you use the default Tor Browser with a transparent proxy. You could get 6 hops from this but it is not guaranteed that these hops will be different. The user could end up with the same hops, possibly in reverse or mixed order. <br>
+      <br>
+      The Tor Project recommends to not use more than three hops.
+    </p>
+
+    <div class="boxed">
+      We don't want to encourage people to use paths longer than this — it increases load on the network without (as far as we can tell) providing any more security. Remember that the best way to attack Tor is to attack the endpoints and ignore the middle of the path. Also, using paths longer than 3 could harm anonymity, first because it makes "denial of security" attacks easier, and second because it could act as an identifier if only a few people do it ("Oh, there's that person who changed her path length again").
+    </div>
+
+    <p>
+      <a href="https://2019.www.torproject.org/docs/faq.html.en#ChoosePathLength">https://2019.www.torproject.org/docs/faq.html.en#ChoosePathLength</a>
+    </p>
+
+    <h3 id="tor_browser_tor_over_tor">8.6 Configuring the Tor Browser to prevent Tor over Tor</h3>
+
+    <p>
+      If you use a transparent proxy and decide to use the Tor Browser then the Tor Browser's Tor traffic with get forced through Tor which gives you Tor over Tor. <br>
+      <br>
+      A way around this is to disable Tor in the Tor Browser. In /etc/environment add <sup><a href="#ref-36">[36]</a></sup>
+    </p>
+
+    <div class="boxed">
+      ## Deactivate tor-launcher <br>
+      TOR_SKIP_LAUNCH=1 <br>
+      <br>
+      ## Environment variable to disable the "TorButton" <br>
+      ## "Open Network Settings" menu item. It is not useful and confusing to have. <br>
+      TOR_NO_DISPLAY_NETWORK_SETTINGS=1 <br>
+      <br>
+      ## Environment variable to skip TorButton control port verification <br>
+      TOR_SKIP_CONTROLPORTTEST=1
+    </div>
+
+    <p>
+      Tor should now be disabled in the Tor Browser. You should also configure the proxy settings of the Tor Browser so you can use stream isolation. Create a user.js file in the default profile of the Tor Browser. Add <sup><a href="#ref-36">[36]</a></sup>
+    </p>
+
+    <div class="boxed">
+      user_pref("extensions.torlauncher.start_tor", false); <br>
+      user_pref("network.proxy.socks", "127.0.0.1"); <br>
+      user_pref("network.proxy.socks_port", "9150"); <br>
+      user_pref("network.proxy.socks_remote_dns", true); <br>
+      user_pref("network.proxy.type", 1); <br>
+      user_pref("extensions.torlauncher.control_host", "127.0.0.1"); <br>
+      user_pref("extensions.torlauncher.control_port", "9150"); <br>
+    </div>
+
+    <p>
+      Change 9150 to your configured SocksPort.
+    </p>
+
+    <h2 id="hostnames">9. Hostnames and Usernames</h2>
+
+    <p>
+      Do not put anything uniquely indentifying in your hostname or username. It is recommended to keep them as generic names such as "host" and "user" so you can't be identified by them.
+    </p>
+
+    <h2 id="bluetooth">10. Wireless Devices</h2>
+
+    <p>
+      Wireless devices add a lot of potential attack surface so you should disable as much of these as possible to reduce attack surface. To block all wireless devices run </sup>
+    </p>
+
+    <div class="boxed">
+      rfkill block all
+    </div>
+
+    <p>
+      You can also blacklist certain modules to prevent them from loading. For example, to blacklist the bluetooth module, create /etc/modprobe.d/blacklist-bluetooth.conf and add
+    </p>
+
+    <div class="boxed">
+       install btusb /bin/true <br>
+       install bluetooth /bin/true
+    </div>
+
+    <p>
+      You should always use <span class="boxed">install (module) /bin/true</span> instead of <span class="boxed">blacklist (module)</span> as modules blacklisted via <span class="boxed">blacklist</span> can still be loaded if another module depends on it.
+    </p>
+
+    <h2 id="mac_address">11. MAC Address Spoofing</h2>
+
+    <p>
+      MAC addresses can be used to identify you. They are unique identifiers exposed when you connect to a network. To spoof them, install macchanger and run
+    </p>
+
+    <div class="boxed">
+      macchanger -e (network interface)
+    </div>
+
+    <p>
+      To find out your network interfaces run
+    </p>
+
+    <div class="boxed">
+      ip a
+    </div>
+
+    <br>
+    <br>
+
+    <div class="boxed">
+      [Unit] <br>
+      Description=macchanger on eth0 <br>
+      Wants=network-pre.target <br>
+      Before=network-pre.target <br>
+      BindsTo=sys-subsystem-net-devices-eth0.device <br>
+      After=sys-subsystem-net-devices-eth0.device <br>
+      <br>
+      [Service] <br>
+      ExecStart=/usr/bin/macchanger -e eth0 <br>
+      Type=oneshot <br>
+      <br>
+      [Install] <br>
+      WantedBy=multi-user.target <br>
+    </div>
+
+    <p>
+      Here is a systemd service to spoof the MAC address of eth0 at boot. Replace eth0 with your network interface. <br>
+      <br>
+      You should always use "macchanger -e" rather than "macchanger -r". This is because "macchanger -r" completely randomizes the MAC address which makes it really obvious that you're spoofing your MAC address which makes you stand out. "macchanger -e" doesn't spoof the vendor bytes so it's much more believable.
+    </p>
+
+    <h2 id="umask">12. Umask</h2>
+
+    <p>
+      Umasks set the default file permissions for newly created files. <sup><a href="#ref-40">[40]</a></sup> The default is 022 which is not very secure. This gives read access to every user on the system for newly created files. Edit /etc/profile and change the umask to 0077 which makes new files not readable by anyone other than the owner.
+    </p>
+
+    <h2 id="usbs">13. USBs</h2>
+
+    <p>
+      USBs are dangerous as they can contain malware. It is best to block all newly connected USBs by default to prevent these attacks. USBGuard is good for this. <br>
+      <br>
+      You could use "nousb" as a boot parameter to disable all USB support. <br>
+      <br>
+      If using linux-hardened, set the <span class="boxed">kernel.deny_new_usb=1</span> sysctl.
+    </p>
+
+    <h2 id="thunderbolt_and_firewire">14. DMA Attacks</h2>
+
+    <p>
+      Thunderbolt and Firewire can be used for Direct Memory Access (DMA) attacks. <sup><a href="#ref-42">[42]</a></sup> <sup><a href="#ref-43">[43]</a></sup> Disable these modules by creating "/etc/modprobe.d/blacklist-dma.conf". To blacklist these modules from loading add
+    </p>
+
+    <div class="boxed">
+      install firewire-core /bin/true <br>
+      install thunderbolt /bin/true
+    </div>
+
+    <p>
+      You should enable IOMMU in your BIOS and by the "intel_iommu=on" (if using Intel) or the "amd_iommu=on" (if using AMD) boot parameters to enforce isolation between devices.
+    </p>
+
+    <h2 id="virtual_machines">15. Virtual Machines</h2>
+
+    <p>
+      Virtual Machines (VMs) isolate processes by virtualizing an entirely new system. I recommend to use KVM/QEMU.
+    </p>
+
+    <h3 id="virtualbox">15.1 Virtualbox</h3>
+
+    <p>
+      You should not use Virtualbox for multiple reasons. <sup><a href="#ref-44">[44]</a></sup> <br>
+      <br>
+      1) They use a non-free toolchain to compile their BIOS which is problematic for some free software projects. <br>
+      <br>
+      2) They don't fix security bugs. Many bugs are left in because the developers are too lazy to fix them. <br>
+      <br>
+      3) They rarely tell people about bugs. If they discover a bug they hide it from everyone else which makes it a lot harder for the community to make patches. <br>
+      <br>
+      4) A lot of important features only come with the extension pack which is proprietary.
+    </p>
+
+    <h3 id="kvm/qemu">15.2 KVM/QEMU</h3>
+
+    <p>
+      KVM is a kernel module that allows the kernel to function like a hypervisor. <br>
+      <br>
+      QEMU is an emulator that can use KVM. <br>
+      <br>
+      Virt-manager and GNOME Boxes are both good and easy to use GUIs to manage KVM/QEMU virtual machines.
+     <p>
+
+    <h2 id="core_dumps">16. Core Dumps</h2>
+
+    <p>
+      Core dumps contain the recorded state of the working memory of a program at a specific time, usually when that program has crashed. These can contain very important information such as passwords and encryption keys. <sup><a href="#ref-45">[45]</a></sup> You should disable these to prevent someone from accessing that information. <br>
+      <br>
+      There are three ways to disable them. With sysctl, systemd and ulimit. The sysctl way may not properly disable core dumps as systemd overrides it. I use all three ways to make sure core dumps are disabled.
+    </p>
+
+    <h3 id="core_dumps_sysctl">16.1 Sysctl</h3>
+
+    <p>
+      Create /etc/sysctl.d/coredump.conf or edit /etc/sysctl.conf (this does not exist on arch). Add this to possibly disable core dumps. <sup><a href="#ref-46">[46]</a></sup> <sup><a href="#ref-47">[47]</a></sup>
+    </p>
+
+    <div class="boxed">
+       kernel.core_pattern=|/bin/false
+    </div>
+
+    <h3 id="core_dumps_systemd">16.2 Systemd</h3>
+
+    <p>
+      Create /etc/systemd/coredump.conf.d/custom.conf. You may need to create /etc/systemd/coredump.conf.d/ first. Add this to disable core dumps. <sup><a href="#ref-46">[46]</a></sup> <sup><a href="#ref-47">[47]</a></sup>
+    </p>
+
+    <div class="boxed">
+      [Coredump] <br>
+      Storage=none
+    </div>
+
+    <h3 id="core_dumps_ulimit">16.3 Ulimit</h3>
+
+    <p>
+      In /etc/security/limits.conf add <sup><a href="#ref-46">[46]</a></sup> <sup><a href="#ref-47">[47]</a></sup>
+    </p>
+
+    <div class="boxed">
+      * hard core 0
+    </div>
+
+    <h3 id="core_dumps_setuid">16.4 Disabling setuid processes from dumping their memory</h3>
+
+    <p>
+      Process that run with elevated privileges (setuid) may still dump their memory even after these settings. To prevent them from doing this create /etc/sysctl.d/suid_dumpable.conf and add <sup><a href="#ref-46">[46]</a></sup>
+    </p>
+
+    <div class="boxed">
+      fs.suid_dumpable=0
+    </div>
+
+    <p>
+      Arch sets this setting by default so there is no need to do this on Arch.
+    </p>
+
+    <h2 id="microcode">17. Microcode Updates</h2>
+
+    <p>
+      Microcode updates are important. They can fix CPU vulnerabilities such the Meltdown and Spectre bugs. <br>
+      <br>
+      AMD uses the amd-ucode package and Intel uses the intel-ucode package. <br>
+      <br>
+      To enable them on GRUB run
+    </p>
+
+    <div class="boxed">
+      grub-mkconfig -o /boot/grub/grub.cfg
+    </div>
+
+    <p>
+      More information and ways to enable them on different bootloaders can be found on the <a href="https://wiki.archlinux.org/index.php/Microcode">Arch Wiki</a>.
+    </p>
+
+    <h2 id="icmp_timestamps">18. ICMP Timestamps</h2>
+
+    <p>
+      ICMP timestamps can expose your clock time which can be used for clock skew fingerprinting attackers. The easiest way is to block these is by blocking all incoming connections with a firewall.
+
+    <h2 id="ntp">19. NTP</h2>
+
+    <p>
+      NTP is very insecure as it is unauthenticated and unencrypted. This means someone can do a man in the middle attack on your connection and give you a false time. This allows for fingerprinting as an attacker can give you a unique time and be able to track you with that. It also means you are vulnerable to <a href="https://en.wikipedia.org/wiki/Replay_attack">replay attacks</a>. <sup><a href="#ref-52">[52]</a></sup> <br>
+      <br>
+      NTP leaks your local computer time in NTP timestamp format which can be used for clock skew fingerprinting. This can be used to <a href="https://murdoch.is/papers/ccs06hotornot.pdf">de-anonymize users and onion services</a>. <br>
+      <br>
+      There is authentication for NTP called autokey but this <a href="http://zero-entropy.de/autokey_analysis.pdf">is insecure</a> and doesn't solve the problem of clock skew fingerprinting. <br>
+      <br>
+      You might want to disable this and use your local system and hardware clock although this can make you more vulnerable to clock skew fingerprinting. I have developed a tool called <a href="https://gitlab.com/madaidan/secure-time-sync">Secure Time Synchronization</a> that securely syncs the time to the current UTC time. You may also want to look into Whonix's sdwdate. <br>
+      <br>
+      Uninstall any NTP clients and disable it by running
+    </p>
+
+    <div class="boxed">
+      timedatectl set-ntp 0
+    </div>
+
+    <p>
+      and
+    </p>
+
+    <div class="boxed">
+      systemctl disable systemd-timesyncd.service
+    </div>
+
+    <p>
+      If you're on a server, then it is unrecommended to disable NTP as it is needed for highly accurate time synchronization.
+    </p>
+
+    <h2 id="ipv6_privacy">20. IPv6 Privacy Extensions</h2>
+
+    <p>
+      IPv6 addresses are generated through your computer's MAC address. This makes every IPv6 address completely unique and tied directly to your computer. <sup><a href="#ref-53">[53]</a></sup> Since this can be used to track you, you should either use IPv6 privacy extensions or disable IPv6 entirely. As to not lose the benefits of IPv6 you could use privacy extensions rather than disabling it. Privacy extensions generate a random IPv6 address out of your original one to prevent you from being tracked by it. <sup><a href="#ref-54">[54]</a></sup> <br>
+      <br>
+      To enable these create /etc/sysctl/ipv6_privacy.conf and add <sup><a href="#ref-55">[55]</a></sup>
+    </p>
+
+    <div class="boxed">
+      net.ipv6.conf.all.use_tempaddr = 2 <br>
+      net.ipv6.conf.default.use_tempaddr = 2 <br>
+      net.ipv6.conf.eth0.use_tempaddr = 2 <br>
+      net.ipv6.conf.wlan0.use_tempaddr = 2
+    </div>
+
+    <p>
+      Replace "eth0" and "wlan0" with your network interfaces. You can find these by running
+    </p>
+
+    <div class="boxed">
+      ip a
+    </div>
+
+    <h3 id="ipv6_networkmanager">20.1 NetworkManager</h3>
+
+    <p>
+      NetworkManager does not use these settings and still uses your original IPv6 address. To enable privacy extensions for NetworkManager, add these lines to /etc/NetworkManager/NetworkManager.conf <sup><a href="#ref-56">[56]</a></sup>
+    </p>
+
+    <div class="boxed">
+      [connection] <br>
+      ipv6.ip6-privacy=2
+    </div>
+
+    <h3 id="ipv6_systemd-networkd">20.2 systemd-networkd</h3>
+
+    <p>
+      systemd-networkd also does not use these settings and will still use your original IPv6 address. To enable privacy extensions for systemd-networkd, create /etc/systemd/network/ipv6.conf and add <sup><a href="#ref-57">[57]</a></sup>
+    </p>
+
+    <div class="boxed">
+      [Network] <br>
+      IPv6PrivacyExtensions=kernel
+    </div>
+
+    <h2 id="bootloaders">21. Bootloaders</h2>
+
+    <p>
+      It is very important that you protect your bootloader. A local attacker can get a root shell by using some thing like "init=/bin/bash" as a kernel parameter at boot. This tells the kernel to execute /bin/bash instead of your normal init system. <sup><a href="#ref-58">[58]</a></sup> You can prevent this by encrypting /boot or setting a password for your bootloader.
+    </p>
+
+    <h3 id="grub">21.1 GRUB</h3>
+
+    <p>
+      To set a password for GRUB, run <sup><a href="#ref-59">[59]</a></sup>
+    </p>
+
+    <div class="boxed">
+      grub-mkpasswd-pbkdf2
+    </div>
+
+    <p>
+      Enter your password and a string will be generated from that password. It will be like grub.pbkdf2.sha512.10000.*, where * can be anything. Edit /etc/grub.d/40_custom and add
+    </p>
+
+    <div class="boxed">
+      set superusers="username" <br>
+      password_pbkdf2 username (password)
+    </div>
+
+    <p>
+      Replace "(password)" with the string generated by "grub-mkpasswd-pbkdf2". The username will be for the superusers who are users that are permitted to use the GRUB command line, edit menu entries, and execute any menu entry. For most people you can just keep this as "root". <br>
+      <br>
+      Regenerate your configuration file with
+    </p>
+
+    <div class="boxed">
+      grub-mkconfig /boot/grub/grub.cfg
+    </div>
+
+    <p>
+      GRUB will now be password protected. <br>
+      <br>
+      To restrict only editing the boot parameters and accessing the GRUB console while still allowing you to boot, edit /boot/grub/grub.cfg and next to "menuentry 'OS Name'" add "--unrestricted" e.g.
+    </p>
+
+    <div class="boxed">
+      menuentry 'Arch Linux' --unrestricted
+    </div>
+
+    <p>
+      You will need to regenerate your configuration file again. <br>
+      <br>
+      GRUB also has support for encrypting /boot.
+    </p>
+
+    <h3 id="syslinux">21.2 Syslinux</h3>
+
+    <p>
+      Syslinux can either set a master password or a menu password. A master password is required while booting any entry while a menu password is only required while booting a specified entry. <sup><a href="#ref-60">[60]</a></sup> <br>
+      <br>
+      To set a master password for Syslinux, edit /boot/syslinux/syslinux.cfg and add
+    </p>
+
+    <div class="boxed">
+      MENU MASTER PASSWD (password)
+    </div>
+
+    <p>
+      Replace "(password)" with the password you want to set. <br>
+      <br>
+      To set a menu password, edit /boot/syslinux/syslinux.cfg and within a label that has the item you want to password protect, add
+    </p>
+
+    <div class="boxed">
+      MENU PASSWD (password)
+    </div>
+
+    <p>
+      Replace "(password)" with the password you want to set. <br>
+      <br>
+      These passwords can either be plaintext or hashed with MD5, SHA-1, SHA-2-256 or SHA-2-512. <br>
+      <br>
+      Syslinux does not have support for encrypting /boot.
+    </p>
+
+    <h3 id="systemd-boot">21.3 systemd-boot</h3>
+
+    <p>
+      systemd-boot has the option to prevent editing the kernel parameters at boot. In the loader.conf file add <sup><a href="#ref-61">[61]</a></sup>
+    </p>
+
+    <div class="boxed">
+      editor no
+    </div>
+
+    <p>
+      This will disabling editing the boot parameters. <br>
+      <br>
+      systemd-boot does not officially support password protecting the kernel parameters editor but you can do it with <a href="https://aur.archlinux.org/packages/systemd-boot-password">systemd-boot-password</a> from the AUR. To install this run
+    </p>
+
+    <div class="boxed">
+      sbpctl install (esp)
+    </div>
+
+    <p>
+      Replace "(esp)" with your esp directory. The editor needs to be enabled in loader.conf to be prompted for a password.
+    </p>
+
+    <h2 id="pam">22. PAM</h2>
+
+    <p>
+      PAM is a framework for system-wide user authentication. <sup><a href="#ref-62">[62]</a></sup> It is what you use when you login. You can make it more secure by requiring strong passwords, locking out users etc. <br>
+      <br>
+      To enforce strong passwords you can use pam_cracklib. It enforces a configurable policy for passwords throughout the system. <sup><a href="#ref-63">[63]</a></sup> If you want passwords to require 10 characters minimum (minlen), at least 6 different characters from the old password (difok), at least 1 digit (dcredit), at least 1 uppercase (ucredit), at least 1 other character (ocredit) and at least 1 lowercase (lcredit) then edit /etc/pam.d/passwd and add
+    </p>
+
+    <div class="boxed">
+      password required pam_cracklib.so retry=2 minlen=10 difok=6 dcredit=-1 ucredit=-1 ocredit=-1 lcredit=-1 <br>
+      password required pam_unix.so use_authtok sha512 shadow
+    </div>
+
+    <p>
+      This can be changed to whatever you want. <br>
+      <br>
+      To add a delay of at least 4 seconds between failed login attempts edit /etc/pam.d/system-login and add <sup><a href="#ref-64">[64]</a></sup>
+    </p>
+
+    <div class="boxed">
+      auth optional pam_faildelay.so delay=4000000
+    </div>
+
+    <p>
+      4000000 is 4 seconds in microseconds. <br>
+      <br>
+      To lockout user after three failed login attempts edit /etc/pam.d/system-login and add <sup><a href="#ref-65">[65]</a></sup>
+    </p>
+
+    <div class="boxed">
+      auth required pam_tally2.so deny=3 unlock_time=600 onerr=succeed file=/var/log/tallylog
+    </div>
+
+    <h2 id="uncommon_protocols">23. Blacklist Uncommon Network Protocols</h2>
+
+    <p>
+      The kernel allows unprivileged users to cause certain modules to be loaded via module auto-loading which adds a ton of attack surface as users can auto-load vulnerable modules which is then exploited. Obscure networking protocols in particular add a lot of attack surface and unused protocols should be blacklisted. <sup><a href="#ref-66">[66]</a></sup> <sup><a href="#ref-67">[67]</a></sup> Create /etc/modprobe.d/uncommon-network-protocols.conf and add
+    </p>
+
+    <div class="boxed">
+      install dccp /bin/true <br>
+      install sctp /bin/true <br>
+      install rds /bin/true <br>
+      install tipc /bin/true <br>
+      install n-hdlc /bin/true <br>
+      install ax25 /bin/true <br>
+      install netrom /bin/true <br>
+      install x25 /bin/true <br>
+      install rose /bin/true <br>
+      install decnet /bin/true <br>
+      install econet /bin/true <br>
+      install af_802154 /bin/true <br>
+      install ipx /bin/true <br>
+      install appletalk /bin/true <br>
+      install psnap /bin/true <br>
+      install p8023 /bin/true <br>
+      install llc /bin/true <br>
+      install p8022 /bin/true
+    </div>
+
+    <p>
+      "install" tells modprobe to run a command instead of loading the module as normal. /bin/true is a command that returns 0 which will do nothing. Both of these together tells the kernel to run /bin/true instead of loading the module which will prevent the module from being loaded.
+    </p>
+
+    <h2 id="partitioning">24. Partitioning and Mount Options</h2>
+
+    <p>
+      You should separate file systems into various partitions so you will have more fine grained control over their permissions and will add an extra layer of security. You can add different mount options to restrict what can happen on a file system. The main ones are: <br>
+      <br>
+      nodev - Do not interpret devices on the file system. <br>
+      nosuid - Do not allow setuid or setgid bits. <br>
+      noexec - Do not allow execution of any binaries on the filesystem. <br>
+      <br>
+      You should put these mount options wherever possible. Nodev can be put everywhere except / and chroot partitions. Noexec can be put anywhere that doesn't execute binaries inside it. <br>
+      <br>
+      You can do this in /etc/fstab. <br>
+      <br>
+      An example of a /etc/fstab file:
+    </p>
+
+    <div class="boxed_smallest">
+      <pre>
+/        /          ext4    defaults                      1 1
+/tmp     /tmp       ext4    defaults,nosuid,noexec,nodev  1 2
+/home    /home      ext4    defaults,nosuid,nodev         1 2
+/var     /var       ext4    defaults,nosuid               1 2
+/boot    /boot      ext4    defaults,nosuid,noexec,nodev  1 2
+/tmp     /var/tmp   ext4    defaults,bind,nosuid,noexec,nodev 1 2
+      </pre>
+    </div>
+
+    <h2 id="uncommon_filesystems">25. Disable Mounting of Uncommon Filesystems</h2>
+
+    <p>
+      There are a few uncommon filesystems that are very rarely used. These don't serve any purpose for most people and it would be best to disable mounting these to reduce attack surface. Create /etc/modprobe.d/uncommon-filesystems.conf and add
+    </p>
+
+    <div class="boxed">
+      install cramfs /bin/true <br>
+      install freevxfs /bin/true <br>
+      install jffs2 /bin/true <br>
+      install hfs /bin/true <br>
+      install hfsplus /bin/true <br>
+      install squashfs /bin/true <br>
+      install udf /bin/true
+    </div>
+
+    <p>
+      You should make sure that these filesystems aren't being used anywhere before doing this.
+    </p>
+
+    <h2 id="editing_as_root">26. Editing Files as Root</h2>
+
+    <p>
+      It is unrecommended to run ordinary text editors as root because many text editors can do more than edit text files and this can be exploited. For example, open vi as root by running
+    </p>
+
+    <div class="boxed">
+      sudo vi
+    </div>
+
+    <p>
+      Now enter ":sh". You now have a root shell with access to your entire system which an attacker can easily exploit this. <br>
+      <br>
+      A solution to this, is using sudoedit. This copies the file to a temporary location, opens the text editor as an ordinary user, edits the temporary file and overwrites the original file as root. This way, the actual editor doesn't run as root. To use sudoedit, run
+    </p>
+
+    <div class="boxed">
+      sudoedit /path/to/file
+    </div>
+
+    <p>
+      By default, it uses vi but the default editor can be changed using the EDITOR or SUDO_EDITOR environment variable. For example, to use sudoedit with nano, run
+    </p>
+
+    <div class="boxed">
+      EDITOR=nano sudoedit /path/to/file
+    </div>
+
+    <p>
+      This environment variable can be set globally in /etc/environment.
+    </p>
+
+    <h2 id="entropy">27. Entropy</h2>
+
+    <p>
+      Entropy is the randomness collected by an operating system. Entropy is crucial for things such as encryption so it is best to gather as much entropy as possible.
+    </p>
+
+    <h3 id="haveged">27.1 Haveged</h3>
+
+    <p>
+      Haveged is a random number generator that gathers more entropy. To install it, run
+    </p>
+
+    <div class="boxed">
+      sudo pacman -S haveged
+    </div>
+
+    <p>
+      Enable it by running
+    </p>
+
+    <div class="boxed">
+      sudo systemctl enable --now haveged.service
+    </div>
+
+    <h3 id="jitterentropy">27.2 Jitterentropy</h3>
+
+    <p>
+      Jitterentropy is another random number generator. To install it, run
+    </p>
+
+    <div class="boxed">
+      sudo pacman -S jitterentropy
+    </div>
+
+    <h2 id="microphones_and_webcams">28. Microphones and Webcams</h2>
+
+    <p>
+      Malware can take over microphones and webcams<sup><a href="#ref-71">[71]</a></sup> which can then be used to spy on you by recording a video of you or recording what you say. Because of this, it is recommended to remove any microphones or webcams. It is best to physically remove them but you can also blacklist the kernel modules for them. Speakers can also be turned into a microphone to spy on you. <sup><a href="#ref-72">[72]</a></sup> <br>
+      <br>
+      To blacklist the webcam kernel module, create /etc/modprobe.d/blacklist-webcam.conf and add
+    </p>
+
+    <div class="boxed">
+      install uvcvideo /bin/true
+    </div>
+
+    <p>
+      The kernel module for the microphone is the same as the one for the speaker. This means disabling the microphone in this method will also disable any speakers. To find the name of the module, look in /proc/asound/modules. Create /etc/modprobe.d/blacklist-mic.conf and add
+    </p>
+
+    <div class="boxed">
+      install (module) /bin/true
+    </div>
+
+    <p>
+      Replace "(module)" with whatever you found in /proc/asound/modules. For example, if you found "snd_hda_intel", you would add
+    </p>
+
+    <div class="boxed">
+      install snd_hda_intel /bin/true
+    </div>
+
+    <p>
+      You should also disable the webcam and microphone in your BIOS if possible.
+    </p>
+
+    <h2 id="best_practices">29. Best Practices</h2>
+
+    <p>
+      Now you will have a secure system and there isn't really much more you can do. You should follow good privacy/security practices: <br>
+      <br>
+      1. Disable/remove things you don't need. <br>
+      2. Use strong passwords. <br>
+      3. Stay updated. Configure a cron job to update your system daily. <br>
+      4. Don't leak any information about you or your system.
+    </p>
+
+    <h2>Other Guides</h2>
+
+    <a href="https://wiki.archlinux.org/index.php/Security">Arch Linux Hardening Guide</a> <br>
+    <br>
+    <a href="https://wiki.debian.org/Hardening">Debian Hardening Guide</a> <br>
+    <br>
+    <a href="https://wiki.gentoo.org/wiki/Hardened_Gentoo">Gentoo Hardening Guide</a> <br>
+    <br>
+    <a href="https://wiki.centos.org/HowTos/OS_Protection">CentOS Hardening Guide</a> <br>
+    <br>
+    <a href="https://www.whonix.org/wiki/Documentation">Whonix Documentation</a> <br>
+    <br>
+    <a href="https://web.archive.org/web/20160307150120/http://www.nsa.gov/ia/_files/os/redhat/rhel5-guide-i731.pdf">NSA RHEL5 Hardening Guide</a> (a bit outdated) <br>
+    <br>
+    <a href="https://coindataflow.com/en">Discover here </a> lots of privacy blockchain projects
+    
+
+    <h2 id="references">References</h2>
+
+    <p>
+      1. <cite><a href="https://lwn.net/Articles/420403/" id="ref-1">kptr_restrict for hiding kernel pointers</a> https://lwn.net</cite> <br>
+      <br>
+      2. <cite><a href="https://www.kernel.org/doc/Documentation/sysctl/kernel.txt" id="ref-2">Kernel Sysctl Docs</a> https://www.kernel.org</cite> <br>
+      <br>
+      3. <cite><a href="https://www.kernel.org/doc/Documentation/sysctl/net.txt" id="ref-3">Kernel Sysctl Docs</a> https://www.kernel.org</cite> <br>
+      <br>
+      4. <cite><a href="https://linux-audit.com/protect-ptrace-processes-kernel-yama-ptrace_scope/" id="ref-4">Protect against the usage of Ptrace</a> https://linux-audit.com</cite> <br>
+      <br>
+      5. <cite><a href="https://en.wikipedia.org/wiki/Ptrace" id="ref-5">ptrace</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      6. <cite><a href="https://www.kernel.org/doc/Documentation/sysctl/kernel.txt" id="ref-6">Kernel Sysctl Docs</a> https://www.kernel.org</cite> <br>
+      <br>
+      7. <cite><a href="https://en.wikipedia.org/wiki/Kexec" id="ref-7">kexec</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      8. <cite><a href="https://wiki.archlinux.org/index.php/Sysctl#TCP/IP_stack_hardening" id="ref-8">sysctl</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      9. <cite><a href="https://en.wikipedia.org/wiki/SYN_flood" id="ref-9">SYN flood</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      10. <cite><a href="https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1040995.html" id="ref-10">Allow customizable random offset to mmap_base address.</a> https://www.mail-archive.com/linux-kernel</cite> <br>
+      <br>
+      11. <cite><a href="https://www.whonix.org/wiki/Disable_TCP_and_ICMP_Timestamps#Disable_TCP_Timestamps" id="ref-11">Disable TCP Timestamps</a> https://www.whonix.org</cite> <br>
+      <br>
+      12. <cite><a href="https://wiki.archlinux.org/index.php/AppArmor" id="ref-12">AppArmor</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      13. <cite><a href="https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html" id="ref-13">The kernel’s command-line parameters</a> https://www.kernel.org</cite> <br>
+      <br>
+      14. <cite><a href="https://tails.boum.org/contribute/design/kernel_hardening/" id="ref-14">kernel hardening</a> https://tails.boum.org</cite> <br>
+      <br>
+      15. <cite><a href="https://www.kernel.org/doc/Documentation/networking/ipv6.txt" id="ref-15">Kernel IPv6 Docs</a> https://www.kernel.org</cite> <br>
+      <br>
+      16. <cite><a href="https://wiki.archlinux.org/index.php/Audit_framework" id="ref-16">Audit framework</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      17. <cite><a href="https://en.wikipedia.org/wiki/Procfs" id="ref-17">procfs</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      18. <cite><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0499680a42141d86417a8fbaa8c8db806bea1201" id="ref-18">procfs: add hidepid= and gid= mount options</a> https://git.kernel.org</cite> <br>
+      <br>
+      19. <cite><a href="https://github.com/anthraxx/linux-hardened" id="ref-19">linux-hardened</a> https://github.com</cite> <br>
+      <br>
+      20. <cite><a href="https://grsecurity.net" id="ref-20">Grsecurity</a> https://grsecurity.net</cite> <br>
+      <br>
+      21. <cite><a href="https://blog.invisiblethings.org/2011/04/23/linux-security-circus-on-gui-isolation.html" id="ref-21">The Linux Security Circus: On GUI isolation</a> https://blog.invisiblethings.org</cite> <br>
+      <br>
+      22. <cite><a href="https://firejail.wordpress.com/documentation-2/x11-guide/" id="ref-22">X11 Guide</a> https://firejail.wordpress.com</cite> <br>
+      <br>
+      23. <cite><a href="http://man7.org/linux/man-pages/man5/securetty.5.html00" id="ref-23">SECURETTY(5)</a> http://man7.org</cite> <br>
+      <br>
+      24. <cite><a href="http://man7.org/linux/man-pages/man1/su.1.html" id="ref-24">SU(1)</a> http://man7.org</cite> <br>
+      <br>
+      25. <cite><a href="https://www.cyberciti.biz/tips/restrict-the-use-of-su-command.html" id="ref-25">Restrict the use of su command</a> https://www.cyberciti.biz</cite> <br>
+      <br>
+      26. <cite><a href="https://cromwell-intl.com/cybersecurity/root-password.html" id="ref-26">The root password is ... irrelevant</a> https://cromwell-intl.com</cite> <br>
+      <br>
+      27. <cite><a href="http://man7.org/linux/man-pages/man1/passwd.1.html" id="ref-27">PASSWD(1)</a> http://man7.org</cite> <br>
+      <br>
+      28. <cite><a href="https://wiki.archlinux.org/index.php/OpenSSH#Deny" id="ref-28">OpenSSH</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      29. <cite><a href="https://wiki.archlinux.org/index.php/OpenSSH#Restrict" id="ref-29">OpenSSH</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      30. <cite><a href="https://wiki.archlinux.org/index.php/SHA_password_hashes" id="ref-30">SHA password hashes</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      31. <cite><a href="https://security.stackexchange.com/questions/4641/why-are-people-saying-that-the-x-window-system-is-not-secure/4646#4646" id="ref-31">Why are people saying that the X Window System is not secure?</a> https://security.stackexchange.com</cite> <br>
+      <br>
+      32. <cite><a href="https://wiki.archlinux.org/index.php/Xorg#Rootless_Xorg" id="ref-32">Xorg</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      33. <cite><a href="https://trac.torproject.org/projects/tor/wiki/doc/torsocks" id="ref-33">Torsocks</a> https://trac.torproject.org</cite> <br>
+      <br>
+      34. <cite><a href="https://www.whonix.org/wiki/Stream_Isolation" id="ref-34">Stream Isolation</a> https://whonix.org</cite> <br>
+      <br>
+      35. <cite><a href="https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy" id="ref-35">TransparentProxy</a> https://trac.torproject.org</cite> <br>
+      <br>
+      36. <cite><a href="https://www.whonix.org/wiki/Other_Operating_Systems#Configure_Tor_Browser_Settings" id="ref-36">Other Operating Systems</a> https://www.whonix.org</cite> <br>
+      <br>
+      37. <cite><a href="https://linux.die.net/man/1/rfkill" id="ref-37">rfkill(1) - Linux man page</a> https://linux.die.net</cite> <br>
+      <br>
+      38. <cite><a href="https://en.wikipedia.org/wiki/MAC_address" id="ref-38">MAC address</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      39. <cite><a href="https://blogs.gnome.org/thaller/2016/08/26/mac-address-spoofing-in-networkmanager-1-4-0/" id="ref-39">MAC Address Spoofing in NetworkManager 1.4.0</a> https://blogs.gnome.org</cite> <br>
+      <br>
+      40. <cite><a href="https://en.wikipedia.org/wiki/umask" id="ref-40">umask</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      41. <cite><a href="https://usbguard.github.io/" id="ref-41">USBGuard</a> https://usbguard.github.io</cite> <br>
+      <br>
+      42. <cite><a href="https://en.wikipedia.org/wiki/Thunderbolt_(interface)#Vulnerability_to_DMA_attacks" id="ref-42">Thunderbolt</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      43. <cite><a href="https://en.wikipedia.org/wiki/IEEE_1394#Security_issues" id="ref-43">IEEE 1394</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      44. <cite><a href="https://www.whonix.org/wiki/KVM#Why_Use_KVM_Over_VirtualBox.3F" id="ref-44">Why Use KVM Over VirtualBox?</a> https://www.whonix.org</cite> <br>
+      <br>
+      45. <cite><a href="https://en.wikipedia.org/wiki/Core_dump" id="ref-45">Core dump</a> https://en.wikipedia.org</cite> <br>
+      <br>
+      46. <cite><a href="https://linux-audit.com/understand-and-configure-core-dumps-work-on-linux" id="ref-46">Understand and configure core dumps on Linux</a> https://linux-audit.com</cite> <br>
+      <br>
+      47. <cite><a href="https://wiki.archlinux.org/index.php/Core_dump" id="ref-47">Core dump</a> https://wiki.archlinux.org</cite> <br>
+      <br>
+      48. <cite><a href="https://www.techrepublic.com/article/is-the-intel-management-engine-a-backdoor/" id="ref-48">Is the Intel Management Engine a backdoor?</a> https://www.techrepublic.com</cite> <br>
+      <br>
+      49. <cite><a href="https://www.amd.com/en/technologies/security" id="ref-49">AMD Secure Technology</a> https://www.amd.com</cite> <br>
+      <br>
+      50. <cite><a href="https://www.reddit.com/r/Amd/comments/6o2e6t/amd_is_not_opensourcing_their_psp_code_anytime/" id="ref-50">AMD is NOT Opensourcing their PSP code ANYTIME SOON</a> https://www.reddit.com</cite> <br>
+      <br>
+      51. <cite><a href="https://www.whonix.org/wiki/Disable_TCP_and_ICMP_Timestamps#Disable_ICMP_Timestamps" id="ref-51">Disable ICMP Timestamps</a> https://www.whonix.org</cite> <br>
+      <br>
+      52. <cite><a href="https://www.whonix.org/wiki/Time_Attacks" id="ref-52">Time Attacks</a> https://www.whonix.org</cite> <br>
+      <br>
+      53. <cite><a href="https://iapp.org/news/a/2011-09-09-facing-the-privacy-implications-of-ipv6/" id="ref-53">Facing the privacy implications of IPv6</a> https://iapp.org</cite> <br>
+      <br>
+      54. <cite><a href="https://tools.ietf.org/html/rfc4941" id="ref-54">RFC 4941 - Privacy Extensions for Stateless Address Autoconfiguration in IPv6</a> https://tools.ietf.org</cite> <br>
+      <br>
+      55. <cite><a href="https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt" id="ref-55">Kernel IPv6 Sysctl Docs</a> https://www.kernel.org</cite> <br>
+      <br>
+      56. <cite><a href="https://blogs.gnome.org/lkundrak/2015/12/03/networkmanager-and-privacy-in-the-ipv6-internet/" id="ref-56">NetworkManager and privacy in the IPv6 internet</a> https://blogs.gnome.org</cite> <br>
+      <br>
+      57. <cite><a href="https://www.freedesktop.org/software/systemd/man/systemd.network.html#IPv6PrivacyExtensions=" id="ref-57">systemd.network</a> https://www.freedesktop.org</cite> <br>
+      <br>
+      58. <cite><a href="https://www.redhat.com/archives/rhl-list/2005-March/msg04089.html" id="ref-58">Re: kernel boot parameter : init=/bin/bash</a> https://www.redhat.com</cite> <br>
+      <br>
+      59. <cite><a href="https://www.gnu.org/software/grub/manual/grub/grub.html#Security" id="ref-59">GNU GRUB Manual 2.02</a> https://www.gnu.org</cite> <br>
+      <br>
+      60. <cite><a href="https://wiki.syslinux.org/wiki/index.php?title=Comboot/menu.c32" id="ref-60">Comboot/menu.c32</a> https://wiki.syslinux.org</cite> <br>
+      <br>
+      61. <cite><a href="https://www.freedesktop.org/software/systemd/man/loader.conf.html#editor" id="ref-61">loader.conf</a> https://www.freedesktop.org</cite> <br>
+      <br>
+      62. <cite><a href="http://www.linux-pam.org/whatispam.html" id="ref-62">What is Linux-PAM?</a> www.linux-pam.org</cite> <br>
+      <br>
+      63. <cite><a href="http://www.linux-pam.org/Linux-PAM-html/sag-pam_cracklib.html" id="ref-63">6.2. pam_cracklib</a> http://www.linux-pam.org</cite> <br>
+      <br>
+      64. <cite><a href="http://www.linux-pam.org/Linux-PAM-html/sag-pam_faildelay.html" id="ref-64">6.8. pam_faildelay</a> http://www.linux-pam.org</cite> <br>
+      <br>
+      65. <cite><a href="http://www.linux-pam.org/Linux-PAM-html/sag-pam_tally2.html" id="ref-65">6.33. pam_tally2</a> http://www.linux-pam.org</cite> <br>
+      <br>
+      66. <cite><a href="https://seclists.org/oss-sec/2017/q1/471" id="ref-66">Linux kernel: CVE-2017-6074: DCCP double-free vulnerability (local root)</a> https://seclists.org</cite> <br>
+      <br>
+      67. <cite><a href="https://security.archlinux.org/CVE-2017-8824" id="ref-67">CVE-2017-8824</a> https://security.archlinux.org</cite> <br>
+      <br>
+      68. <cite><a href="https://linux.die.net/man/5/modprobe.d" id="ref-68">modprobe.d(5) - Linux man page</a> https://linux.die.net</cite> <br>
+      <br>
+      69. <cite><a href="https://stackoverflow.com/questions/2175405/what-is-bin-true" id="ref-69">What is /bin/true</a> https://stackoverflow.com</cite> <br>
+      <br>
+      70. <cite><a href="https://linux.die.net/man/8/mount" id="ref-70">mount(8) - Linux man page</a> https://linux.die.net</cite> <br>
+      <br>
+      71. <cite><a href="https://theintercept.com/2014/03/12/nsa-plans-infect-millions-computers-malware/" id="ref-71">How the NSA Plans to Infect ‘Millions’ of Computers with Malware</a> https://theintercept.com</cite> <br>
+      <br>
+      72. <cite><a href="https://arxiv.org/ftp/arxiv/papers/1611/1611.07350.pdf" id="ref-72">SPEAKE(a)R: Turn Speakers to Microphones for Fun and Profit</a> https://arxiv.org</cite>
+
+    </p>
+
+  </body>
+</html>

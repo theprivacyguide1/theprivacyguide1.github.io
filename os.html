@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <link rel="stylesheet" href="styles.css">
+
+<title>Privacy Guide</title>
+</head>
+<body>
+
+<h1><font size="+4"><u>Operating Systems</u></font></h1>
+
+<h2><font size="+3">DO NOT USE:</font></h2>
+
+<p>
+Windows (any version)<br>
+MacOS/OSX<br>
+ChromeOS
+</p>
+
+<h2><font size="+3">USE:</font></h2>
+
+<p>
+GNU/Linux<br>
+BSD
+</p>
+
+<h2><font size="+4">Which Linux distros?</font></h2>
+
+<p>
+Most Linux distros will be fine. If you are a beginner to Linux then I'd recommend Ubuntu (see <a href="os.html#ubuntu">warning</a>), Mint and Manjaro. If you want max privacy then use <a href="https://tails.boum.org/">Tails</a>, <a href="https://www.whonix.org/">Whonix</a> or <a href="https://www.qubes-os.org/">Qubes OS</a>.
+</p>
+
+<img src="images/tux.png" width="300" height="300" alt="Tux">
+<img src="images/qubesos.png" width="300" height="300" alt="Qubes logo">
+<img src="images/tails.png" width="320" height="300" alt="Tails logo">
+
+<h2><font size="+4">But I already use Linux.</font></h2>
+
+<p>
+If you already use Linux then you should harden it as much as you can. Most distros have guides on hardening but they aren't always good.<br>
+<br>
+<a href="https://wiki.archlinux.org/index.php/Security">Arch Linux Hardening</a><br>
+<a href="https://wiki.debian.org/Hardening">Debian Hardening</a><br>
+<a href="https://wiki.gentoo.org/wiki/Hardened_Gentoo">Gentoo Hardening</a><br>
+</p>
+
+<h3><font size="+3">Hardening Tips</font></h3>
+
+<h4><font size="+2"><u>Apparmor</u></font></h4>
+
+<p>
+You should always enable apparmor. This limits what a program can do. The script below will automatically enable apparmor for Arch Linux. If you don't use Arch then you need to modify it for your package manager and kernel paramaters.
+</p>
+
+<div class="boxed">
+  pacman -S --noconfirm -q apparmor<br>
+  sed -i 's/quiet/quiet apparmor=1 security=apparmor audit=1/' /etc/default/grub<br>
+  grub-mkconfig -o /boot/grub/grub.cfg<br>
+  systemctl enable apparmor<br>
+</div>
+
+<h4><font size="+2"><u>Firejail</u></font></h4>
+
+<p>
+Firejail is a very secure and easy to use sandboxing program. It can be used in conjunction with Apparmor by the <span style="border: 1px solid green">firejail --apparmor</span> command. Running <span style="border: 1px solid green">firecfg</span> will make all programs automatically run in a sandbox if there is a profile for them in /etc/firejail. If you want to make only 1 program automatically run in a sandbox then run <span style="border: 1px solid green">ln -s /usr/bin/firejail /usr/local/bin/program</span>.
+</p>
+
+<h4><font size="+2"><b><u>Hardening Sysctl</u></b></font></h4>
+
+<p>
+Sysctl is a tool for examining and changing kernel parameters at runtime. It can be used to harden the kernel. To harden it edit /etc/sysctl.conf or if you run Arch create a file called /etc/sysctl.d/99-sysctl.conf and add the sysctl configs in there. My sysctl changes are below.
+</p>
+
+<div class="boxed">
+ kernel.dmesg_restrict=1<br>
+ kernel.kptr_restrict=1<br>
+ net.ipv4.tcp_syncookies=1<br>
+ net.ipv4.tcp_rfc1337=1<br>
+ net.ipv4.conf.default.rp_filter=1<br>
+ net.ipv4.conf.all.rp_filter=1<br>
+ net.ipv4.conf.all.accept_redirects=0<br>
+ net.ipv4.conf.default.accept_redirects=0<br>
+ net.ipv4.conf.all.secure_redirects=0<br>
+ net.ipv4.conf.default.secure_redirects=0<br>
+ net.ipv6.conf.all.accept_redirects=0<br>
+ net.ipv6.conf.default.accept_redirects=0<br>
+ net.ipv4.conf.all.send_redirects=0<br>
+ net.ipv4.conf.default.send_redirects=0<br>
+ net.ipv4.icmp_echo_ignore_all=1<br>
+ kernel.unprivileged_bpf_disabled=1<br>
+ net.core.bpf_jit_harden=2
+</div>
+
+<h4><font size="+2"><b><u>Mac Address Spoofing</u></b></font></h4>
+
+<p>
+Mac Address Spoofing can be done easily by macchanger. Run <span style="border: 1px solid green">macchanger -r wlp2s0</span>. Replace wlp2s0 with your network interface. You can find these by running <span style="border: 1px solid green">ip a</span>. If you use systemd then you can create a systemd service that randomizes the mac address on boot. It is below.
+</p>
+
+<div class="boxed">
+ [Unit]
+Description=macchanger on <font color="red"><b>wlp2s0</b></font><br>
+Wants=network-pre.target<br>
+Before=network-pre.target<br>
+BindsTo=sys-subsystem-net-devices-<font color="red"><b>wlp2s0</b></font>.device<br>
+After=sys-subsystem-net-devices-<font color="red"><b>wlp2s0</b></font>.device<br>
+<br>
+[Service]<br>
+ExecStart=/usr/bin/macchanger -r <font color="red"><b>wlp2s0</b></font><br>
+Type=oneshot<br>
+<br>
+[Install]<br>
+WantedBy=multi-user.target<br>
+</div>
+<br>
+
+<p>
+Replace <font color="red"><b>wlp2s0</b></font> with your network interface. You can use this service for as many interfaces as you want.
+</p>
+
+<div id="ubuntu">
+ <h2><font size="+3"><u>Ubuntu Warning</u></font></h2>
+ <p>
+ Many people consider Ubuntu to not be privacy friendly. These claims are justified somewhat as Ubuntu has violated user's privacy in the past such as with the Amazon launcher tracking users or when telemetry was enabled by default. Ubuntu also comes with proprietary software so they could also be tracking you as well. Ubuntu is commercial and owned by a UK company who are part of the 5 eyes. I do not believe Ubuntu is anti-privacy but you should still be aware of this.
+ </p>
+ <img src="images/ubuntu.png" width="300" height="300" alt="Ubuntu logo">
+</div>
+<br>
+<br>
+<p>
+<a href="https://theprivacyguide1.github.io/"><button type="button">RETURN</button></a>
+</p>
+
+</body>
+</html>

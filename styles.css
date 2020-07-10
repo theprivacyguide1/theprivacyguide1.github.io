@@ -1,0 +1,93 @@
+body {
+    color: #ffffff;
+    background: url(background.jpeg);
+    max-width: 650px;
+    font-size: 18px;
+    font-family: 'Nobile', Helvetica, Arial, sans-serif;
+    margin: 100px;
+}
+
+a {
+  color: #737373;
+  font-family: 'Nobile', Helvetica, Arial, sans-serif;
+}
+
+h2, h3, h4, h5, h6 {
+    font-family: 'Nobile', Helvetica, Arial, sans-serif;
+    text-shadow: 1px 1px 1px #ccc;
+    font-size: 1.7em;
+}
+
+.small {
+  font-family: 'Nobile', Helvetica, Arial, sans-serif;
+  text-shadow: 1px 1px 1px #ccc;
+  font-size: 1.3em;
+}
+
+h1 {
+  font-size: 3em;
+  font-family: 'Nobile', Helvetica, Arial, sans-serif;
+}
+
+/* index.html header */
+.index h1 {
+    font-size: 50px;
+}
+
+div, font, u {
+    font-family: 'Nobile', Helvetica, Arial, sans-serif;
+}
+
+p {
+    font-family: 'Nobile', Helvetica, Arial, sans-serif;
+    font-size: 18px;
+}
+
+.boxed {
+  border: 1px solid green;
+  font-size: 20px;
+}
+
+.boxed_small {
+  border: 1px solid green;
+  font-size: 18px;
+}
+
+.boxed_smallest {
+  border: 1px solid green;
+  font-size: 16px;
+}
+
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.red_text {
+  font-family: 'Nobile', Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  color: red;
+  font-weight: bold;
+}
+
+.subheaders {
+  margin-left: 10px;
+  font-size: 18px;
+}
+
+.headers {
+  font-size: 20px;
+}
+
+a:target {
+  background-color: #616B87;
+  color: #000000;
+  opacity: 0.5;
+  filter: alpha(opacity=50); /* For IE8, ewww */
+}

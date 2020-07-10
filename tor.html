@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Privacy Guide</title>
+  </head>
+  <body>
+    <h1><u><b>Tor</b></u></h1>
+
+    <p>
+      Tor uses a protocol called onion routing. Onion routing was created by the US Naval Research Lab to allow them to research and get information anonymously. While creating this they realised that if only they used it then the servers they connect to will know it's them since they're the only ones who can use onion routing. This meant they had to release it to the public. <br>
+      <br>
+      Tor was then created by the Tor Project who use Tor as a way to protect people's privacy online and bypass censorship. <br>
+      <br>
+      <a href="https://www.torproject.org/docs/faq.html.en#WhyCalledTor">https://www.torproject.org/docs/faq.html.en#WhyCalledTor</a>
+    </p>
+
+    <h2>Does Tor have a backdoor?</h2>
+
+    <p>
+      Some people believe Tor has backdoors since it was created by the US Navy. This is not true. Tor is completely open source and has been audited many times. You can check yourself for any backdoors. <br>
+      <br>
+      <a href="https://www.torproject.org/docs/faq.html.en#Backdoor">https://www.torproject.org/docs/faq.html.en#Backdoor</a>
+    </p>
+
+    <h2>How does Tor work?</h2>
+
+    <p>
+      Tor encrypts your traffic three times on your machine. It then sends your traffic to three nodes/relays all across the world. These nodes are run by volunteers. Anyone can easily create a node. <br>
+      <br>
+      Each node your traffic bounces through strips away a layer of encryption and forwards it on to the next. Once you reach the exit node it decrypts your traffic fully so you can connect to the website. <br>
+      <br>
+      <img src="images/torinfographic2.png" alt="This image is not displaying correctly."> <br>
+      <br>
+      Since it is encrypted three times, the first and second node can't see anything but where to send the data too and where the data came from. The second node gets the first node's IP and the first node gets your real IP but it doesn't have anything to link this with so it's useless to that node. This makes it impossible for the first and second node to find out who you are and what you're doing. <br>
+      <br>
+      The exit node decrypts the traffic fully so it can see the traffic and inject malicious code. It still doesn't get your real IP and only gets the second node's IP. <br>
+      <br>
+      If you use HTTPS (which most sites use) it encrypts your traffic from the exit node to the website. This stops the exit node from seeing the full URL and only the domain. E.g. they can only see "theprivacyguide1.github.io" and not "theprivacyguide1.github.io/tor.html". HTTPS also stops the exit node from being able to inject malicious code. The Tor Browser has HTTPS Everywhere which changes a HTTP connection to HTTPS if possible. <br>
+      <br>
+      Because your data is encrypted and bounced all over the world this makes it very hard for someone to find out who you are. <br>
+      <br>
+      See <a href="https://www.torproject.org/about/overview.html.en#thesolution">https://www.torproject.org/about/overview.html.en#thesolution</a> for more information.
+    </p>
+
+    <h3>How do onion services work?</h3>
+
+    <p>
+      Onion services are websites that are only accessible through Tor and their URL ends in .onion. https://3g2upl4pq6kufc4m.onion/ is DuckDuckGo's onion service. <br>
+      <br>
+      When you use an onion service you ask the server to allow you to connect. If it accepts then you do the usual three hops and so does the onion service. It meets you at a rendezvous point. This means you can't find out where the onion service is either. <br>
+      <br>
+      Onion services are still inside the Tor network and are end to end encrypted. There are no exit nodes. These are even more secure than Tor for the clearnet. <br>
+      <br>
+      See <a href="https://www.torproject.org/docs/onion-services.html.en">https://www.torproject.org/docs/onion-services.html.en</a> for more information.
+    </p>
+
+    <h2><u>Attacks against the Tor network.</u></h2>
+
+    <p>
+      Tor is not bulletproof. It has vulnerabilities although these aren't very bad.
+    </p>
+
+    <h3><u>Traffic/Timing Correlation</u></h3>
+
+    <p>
+      It's hard to protect against traffic analysis attacks. There isn't much you could do. The main ways people talk about are timing correlation and traffic correlation. <br>
+      <br>
+      Timing correlation is when you are connected to Tor at the same time something happens from Tor. <br>
+      <br>
+      E.g. the Harvard bomb threat. A student wanted to get out of class so they made a bomb threat to the school through Tor. They were the only person connected to Tor in the area when it happened. The police then found out it was them who did it. The only way to protect against this is using Tor more often and generalising it's usage or hiding your Tor usage by using a bridge or other software. <br>
+      <br>
+      Traffic correlation is when somebody monitors the traffic going into Tor and coming out of Tor. They can compare the traffic and see if any are the same. If the traffic looks the same then it could deanonymize users. <br>
+      <br>
+      You can't really protect against this unless a lot more people use Tor to hide your traffic. This attack is really hard to do and if it's performed on you then you're probably a target for the NSA so this would be the least of your problems. <br>
+      <br>
+      None of these attacks mean Tor is broken. Tor is not a magic bullet. It doesn't make you completely anonymous. The Tor project even says this. <br>
+      <br>
+      <a href="https://www.torproject.org/docs/faq.html.en#AttacksOnOnionRouting">https://www.torproject.org/docs/faq.html.en#AttacksOnOnionRouting</a>
+    </p>
+
+    <h4><u>Other Attacks</u></h4>
+
+    <p>
+      Most other attacks are not Tor's fault but the user's fault. Lots of people claim that the FBI javascript malware means they compromised Tor. It doesn't. That malware exploited a vulnerability in an old version of Firefox. There was already an update available a month before it was exploited. This malware sent people's IP addresses to the FBI. This could have easily been mitigated by updating their browser or disabling javascript. <br>
+      <br>
+      This was also an attack against the Tor browser and not Tor itself.
+    </p>
+
+    <h2>Should I use a VPN with Tor?</h2>
+
+    <p>
+      Many people recommend a VPN with Tor to increase your anonymity. In most cases a VPN will not do anything with Tor and in some it can decrease your anonymity. See <a href="https://matt.traudt.xyz/posts/vpn-tor-not-mRikAa4h.html">this post by an expert </a>(<a href="http://zfob4nth675763zthpij33iq4pz5q4qthr3gydih4qbdiwtypr2e3bqd.onion/posts/vpn-tor-not-mRikAa4h.html">onion service</a>).
+    </p>
+
+    <h2>What's the difference between Tor and the Tor Browser?</h2>
+
+    <p>
+      Tor is a network. It does what I described above. The Tor Browser is a browser based off Firefox hardened for privacy that uses Tor.
+    </p>
+
+    <h2>Other Browsers with Tor</h2>
+
+    <p>
+      You should not use any other browser than the Tor Browser with Tor. Doing so will make your browser fingerprint completely different from other Tor users which will deanonymize you and you could easily mess it up and cause it to leak. <br>
+      <br>
+      <a href="https://www.torproject.org/docs/faq.html.en#TBBOtherBrowser">https://www.torproject.org/docs/faq.html.en#TBBOtherBrowser</a>
+    </p>
+
+    <h2>Changing Settings/Adding Extensions in the Tor Browser</h2>
+
+    <p>
+      You should not change any settings in the Tor Browser. This will change your browser fingerprint and may make your browser insecure. <br>
+      <br>
+      I would also advise against adding extensions as they will change your browser fingerprint and may leak. <br>
+      <br>
+      <a href="https://www.torproject.org/docs/faq.html.en#TBBOtherExtensions">https://www.torproject.org/docs/faq.html.en#TBBOtherExtensions</a>
+    </p>
+
+    <h2>Is it Tor or TOR?</h2>
+
+    <p>
+      It is Tor. It used to be called TOR but the name has changed.<br>
+      <br>
+      <a href="https://www.torproject.org/docs/faq.html.en#WhyCalledTor">https://www.torproject.org/docs/faq.html.en#WhyCalledTor</a>
+    </p>
+
+    <br>
+    <br>
+
+    <p>
+    <a href="https://theprivacyguide1.github.io/posts.html"><button type="button">RETURN</button></a>
+    </p>
+
+  </body>
+</html>
